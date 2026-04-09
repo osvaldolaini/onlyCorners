@@ -22,6 +22,8 @@ class UserList extends Component
 
     public $id;
     public $registerId;
+    // Define o layout a ser usado
+    protected $layout = 'app';
 
     protected $listeners =
     [
@@ -41,7 +43,7 @@ class UserList extends Component
         $users = User::where('active', 1)->get();
         return view('livewire.admin.users.user-list', [
             'users' => $users,
-        ]);
+        ])->layout('layouts.' . $this->layout);
     }
 
     //CREATE

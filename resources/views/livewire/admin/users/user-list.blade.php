@@ -1,5 +1,5 @@
 <div>
-    <x-layouts.admin.breadcrumb>
+    {{-- <x-layouts.admin.breadcrumb>
         <div class="grid grid-cols-8 gap-4 text-gray-600 ">
             <div class="col-span-6 justify-items-start">
                 <h3 class="text-2xl font-bold tracki dark:text-gray-50">
@@ -7,7 +7,7 @@
                 </h3>
             </div>
         </div>
-    </x-layouts.admin.breadcrumb>
+    </x-layouts.admin.breadcrumb> --}}
     <div class="flex flex-col items-center justify-between px-4 mt-4 space-y-3 md:flex-row md:space-y-0 md:space-x-4">
         <div
             class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
@@ -123,7 +123,7 @@
         <x-slot name="footer">
             <button class="btn btn-secondary" wire:click="$toggle('showJetModal')" wire:loading.attr="disabled">
                 Cancelar
-            </button >
+            </button>
 
             <button class="ml-2 btn btn-error" wire:click="delete({{ $registerId }})" wire:loading.attr="disabled">
                 Apagar registro

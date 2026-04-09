@@ -4,7 +4,7 @@
         <div>
             <h3 class="font-semibold mb-3">Sobre Nós</h3>
             <p class="text-gray-400 text-sm">
-                Empresa especialista em contabilidade com transparência e agilidade.
+                Software especialisado em dados, estatísticas e palpites sobre escanteios.
             </p>
         </div>
 

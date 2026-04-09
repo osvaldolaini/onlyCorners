@@ -12,15 +12,15 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Route::view('dashboard', 'dashboard')
+//     ->middleware(['auth', 'verified'])
+//     ->name('dashboard');
 
 Route::middleware([
     'auth',
     'verified'
 ])->group(function () {
-    Route::get('/admin/dashboard', Panel::class)->name('dashboard');
+    Route::get('/dashboard', Panel::class)->name('dashboard');
     // Route::get('/versoes', ReadmeView::class)->name('versions');
 });
 
