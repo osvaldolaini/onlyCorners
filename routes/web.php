@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\ReadmeView;
 use App\Livewire\Admin\Page\Panel;
 use App\Livewire\Admin\Settings\Logs;
 use App\Livewire\Admin\Settings\Settings;
@@ -16,6 +17,7 @@ Route::get('/', function () {
 //     ->middleware(['auth', 'verified'])
 //     ->name('dashboard');
 
+Route::get('/versoes', ReadmeView::class)->name('versions');
 Route::middleware([
     'auth',
     'verified'

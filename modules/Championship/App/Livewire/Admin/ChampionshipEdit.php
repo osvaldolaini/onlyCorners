@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Team\App\Livewire\Admin;
+namespace Modules\Championship\App\Livewire\Admin;
 
-use Modules\Team\App\Models\Team;
+
 use Livewire\Component;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
@@ -14,25 +14,27 @@ use Livewire\WithFileUploads;
 
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Modules\Championship\App\Models\Championship;
 
-class TeamEdit extends Component
+class ChampionshipEdit extends Component
 {
+
     // Define o layout a ser usado
     protected $layout = 'app';
 
     public $rules;
 
-    public $back = 'teams-list';
-    public $route = 'teams';
+    public $back = 'championships-list';
+    public $route = 'championships';
 
-    public $breadcrumb = 'Clube';
+    public $breadcrumb = 'Campeonato';
     //Fields
     public $id;
     public $title;
     public $nick;
     public $code;
-    public $country;
-    public $team;
+    public $type;
+    public $championship;
 
 
     public $logo_path;
@@ -44,23 +46,23 @@ class TeamEdit extends Component
 
     public $newImg = '';
 
-    public function mount(Team $team)
+    public function mount(Championship $championship)
     {
-        if ($team->getAttributes()) {
-            $this->id           = $team->id;
-            $this->title        = $team->title;
-            $this->nick         = $team->nick;
-            $this->country      = strtolower($team->country);
+        if ($championship->getAttributes()) {
+            $this->id           = $championship->id;
+            $this->title        = $championship->title;
+            $this->nick         = $championship->nick;
+            $this->type         = strtolower($championship->type);
 
-            $this->logo_path    = $team->logo_path;
+            $this->logo_path    = $championship->logo_path;
             if ($this->logo_path) {
-                $this->photo        = $team->id . '/' . $team->logo_path;
+                $this->photo        = $championship->id . '/' . $championship->logo_path;
             }
         }
     }
     public function render()
     {
-        return view('team::livewire.admin.team-edit')->layout('layouts.' . $this->layout);
+        return view('championship::livewire.admin.championship-edit')->layout('layouts.' . $this->layout);
     }
 
     public function save()
@@ -68,15 +70,15 @@ class TeamEdit extends Component
         $id = $this->real_save();
 
         if ($id) {
-            $team = team::find($id);
-            if ($team->getAttributes()) {
-                $this->team         = $team;
-                $this->id           = $team->id;
-                $this->title        = $team->title;
-                $this->code         = $team->code;
-                $this->logo_path    = $team->logo_path;
+            $championship = Championship::find($id);
+            if ($championship->getAttributes()) {
+                $this->championship         = $championship;
+                $this->id           = $championship->id;
+                $this->title        = $championship->title;
+                $this->code         = $championship->code;
+                $this->logo_path    = $championship->logo_path;
                 if ($this->logo_path) {
-                    $this->photo        = $team->id . '/' . $team->logo_path;
+                    $this->photo        = $championship->id . '/' . $championship->logo_path;
                 }
             }
         }
@@ -92,15 +94,15 @@ class TeamEdit extends Component
         $this->rules = [
             'title'   => 'required',
             'nick'   => 'required',
-            'country'   => 'required',
+            'type'   => 'required',
         ];
         $this->validate();
-        team::updateOrCreate([
+        championship::updateOrCreate([
             'id'    => $this->id,
         ], [
             'title'     => $this->title,
             'nick'      => $this->nick,
-            'country'   => $this->country,
+            'type'   => $this->type,
         ]);
 
         $id = false;
@@ -124,12 +126,12 @@ class TeamEdit extends Component
                 'uploadimage' => ['nullable', 'mimes:jpg,jpeg,png'],
             ]);
 
-            $directory = 'teams/' . $this->team->id;
+            $directory = 'championships/' . $this->championship->id;
             $fullPath = storage_path('app/' . $directory);
 
             // Apaga apenas a imagem anterior, se existir
-            if ($this->team->logo_path) {
-                Storage::delete($directory . '/' . $this->team->logo_path);
+            if ($this->championship->logo_path) {
+                Storage::delete($directory . '/' . $this->championship->logo_path);
             }
 
             if ($this->uploadimage) {
@@ -149,13 +151,13 @@ class TeamEdit extends Component
                 // $this->uploadimage->storeAs('logos-school', $new_name, 'public');
 
                 // Atualizar o caminho da imagem no banco
-                $this->team->logo_path = $new_name;
-                $this->team->save();
+                $this->championship->logo_path = $new_name;
+                $this->championship->save();
 
                 // Chamar a função logo
                 $this->logo(
-                    'teams/' . $this->team->id . '/' . $new_name,
-                    $this->team->id,
+                    'championships/' . $this->championship->id . '/' . $new_name,
+                    $this->championship->id,
                     $code
                 );
             }
@@ -169,13 +171,13 @@ class TeamEdit extends Component
     }
     public function excluirPhoto()
     {
-        $this->team->logo_path = '';
-        $this->team->save();
-        if (Storage::directoryMissing('public/teams/' . $this->team->id)) {
-            Storage::makeDirectory('public/teams/' . $this->team->id, 0755, true, true);
+        $this->championship->logo_path = '';
+        $this->championship->save();
+        if (Storage::directoryMissing('public/championships/' . $this->championship->id)) {
+            Storage::makeDirectory('public/championships/' . $this->championship->id, 0755, true, true);
         }
-        Storage::deleteDirectory('public/teams/' . $this->team->id);
-        $this->photo = $this->team->logo_path;
+        Storage::deleteDirectory('public/championships/' . $this->championship->id);
+        $this->photo = $this->championship->logo_path;
     }
 
     public static function logo($path, $id, $code)
@@ -194,7 +196,7 @@ class TeamEdit extends Component
         $image = $manager->read($fullPath);
 
         // Caminho de destino
-        $savePath = storage_path('app/public/teams/' . $id . '/');
+        $savePath = storage_path('app/public/championships/' . $id . '/');
 
         // Criar diretório se não existir
         if (!file_exists($savePath)) {
