@@ -5,10 +5,8 @@
 > Novo  
 > Configurações
 
--   -   Cadastro de time
--   Cadastro de campeonatos
-
 > Cadastros
 
--   Cadastro de alunos (nome, sexo, nome de guerra, número)
--   Usuários
+-   Cadastro de time
+-   Cadastro de campeonatos
+-   Cadastro de jogos

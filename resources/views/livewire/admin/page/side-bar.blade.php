@@ -73,7 +73,16 @@
 
 
             </div>
-
+            {{-- JOGOS --}}
+            <x-layouts.admin.side-bar-nav-link url="games-list" active="*jogos*" access_page="games">
+                <x-slot name="svg">
+                    <x-layout.svg.soccer class="size-6">
+                    </x-layout.svg.soccer>
+                </x-slot>
+                <x-slot name="title">
+                    Jogos
+                </x-slot>
+            </x-layouts.admin.side-bar-nav-link>
 
 
             {{-- ADMINISTRAÇÃO --}}
