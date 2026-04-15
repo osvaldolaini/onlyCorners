@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Game\App\Models;
+namespace Modules\Corner\App\Models;
+
 
 use App\Traits\HasAttributeConversions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -14,18 +14,23 @@ use Spatie\Activitylog\LogOptions;
 
 use Illuminate\Support\Str;
 use Modules\Championship\App\Models\Championship;
-use Modules\Corner\App\Models\Corner;
+use Modules\Game\App\Models\Game;
 use Modules\Team\App\Models\Team;
 
-class Game extends Model
+class Corner extends Model
 {
 
     use HasFactory, LogsActivity, HasAttributeConversions;
 
-    protected $table = 'games';
+    protected $table = 'corners';
 
     protected $fillable = [
         'active',
+        'half',
+        'game_id',
+        'favored_id',
+        'min',
+        'half',
         'hour',
         'date',
         'championship_id',
@@ -76,9 +81,9 @@ class Game extends Model
         return $this->viewDate($this->date);
     }
 
-    public function corners(): HasMany
+    public function game(): BelongsTo
     {
-        return $this->hasMany(Corner::class, 'game_id', 'id')->where('active', 1);
+        return $this->belongsTo(Game::class, 'game_id', 'id')->where('active', 1);
     }
 
     public function championship(): BelongsTo

@@ -60,6 +60,7 @@ class GameList extends Component
             compact('dataTable')
         )->layout('layouts.' . $this->layout);
     }
+
     public function addSort($field)
     {
         // dd($field);
