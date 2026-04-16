@@ -9,7 +9,7 @@ use Modules\Game\App\Models\Game;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 
-
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class CornerList extends Component
@@ -27,17 +27,54 @@ class CornerList extends Component
     public function mount(Game $game)
     {
         $this->game = $game;
-        $this->corners = $game->corners;
+        $this->corners = $this->game->corners()
+            ->with(['team', 'opponent'])   // carrega os relacionamentos necessários
+            ->orderBy('min', 'desc')
+            ->get();
         $this->half = $game->half;
-        $this->min = $game->min;
         $this->favored_id = $game->favored_id;
-        // dd($this->game);
     }
     public function render()
     {
         return view('corner::livewire.admin.corner-list')->layout('layouts.' . $this->layout);
-        $this->corners = $this->corners;
+        $this->corners = $this->game->corners()
+            ->with(['team', 'opponent'])   // carrega os relacionamentos necessários
+            ->orderBy('min', 'desc')
+            ->get();
     }
+
+    public function incrementMinute(Corner $corner)
+    {
+        $currentMinutes = $this->getMinutesFromTime($corner->min ?? '00:00');
+
+        $newMinutes = $currentMinutes + 1;
+
+        // Limite opcional (ex: máximo 120 minutos)
+        if ($newMinutes > 120) {
+            $newMinutes = 120;
+        }
+
+        $corner->min = $this->minutesToTime($newMinutes);
+        $corner->save();
+
+        $this->loadCorners();
+    }
+    public function decrementMinute(Corner $corner)
+    {
+        $currentMinutes = $this->getMinutesFromTime($corner->min ?? '00:00');
+
+        $newMinutes = $currentMinutes - 1;
+
+        if ($newMinutes < 0) {
+            $newMinutes = 0;
+        }
+
+        $corner->min = $this->minutesToTime($newMinutes);
+        $corner->save();
+
+        $this->loadCorners();
+    }
+
     public function addRow()
     {
         Corner::create([
@@ -51,7 +88,6 @@ class CornerList extends Component
             'code'              => Str::uuid(),
         ]);
         $this->loadCorners();
-        $this->openAlert('success', 'Adicionado com sucesso');
     }
     public function openAlert($status, $msg)
     {
@@ -62,8 +98,10 @@ class CornerList extends Component
     {
         $this->corners = $this->game->corners()
             ->with(['team', 'opponent'])   // carrega os relacionamentos necessários
-            ->orderBy('created_at', 'desc')
+            ->orderBy('min', 'desc')
             ->get();
+
+        $this->openAlert('success', 'Editado com sucesso');
     }
 
     public function removeRow($id)
@@ -71,15 +109,22 @@ class CornerList extends Component
         $corners = Corner::find($id);
         $corners->delete();
         $this->loadCorners();
-        $this->openAlert('success', 'Removido com sucesso');
     }
+    public function updateCornerTeam(Corner $corner, $team)
+    {
+        $corner->favored_id = $team;
+
+        $corner->save();
+        $this->loadCorners();
+    }
+
     public function updateCornerHalf(Corner $corner, $val)
     {
         $corner->half = $val;
 
         $corner->save();
         $this->loadCorners();
-        $this->openAlert('success', 'Editado com sucesso');
+        // $this->openAlert('success', 'Editado com sucesso');
         // dd($val, $corner);
     }
     public function updated($property)
@@ -106,25 +151,43 @@ class CornerList extends Component
             ]);
         }
     }
-    public function updatedContacts($value, $fieldPath)
+    /**
+     * Converte 'HH:MM' ou 'HH:MM:SS' para total de minutos (inteiro)
+     */
+    private function getMinutesFromTime($timeString)
     {
-        [$index, $field] = explode('.', $fieldPath);
-        $contactData = $this->contacts[$index] ?? null;
+        if (empty($timeString)) {
+            return 0;
+        }
 
-        if (!$contactData || empty($contactData['id'])) return;
+        // Garante que é string
+        $timeString = (string) $timeString;
 
-        // $rules = [
-        //     'parent' => 'nullable|string|max:255',
-        //     'type' => 'required|string',
-        //     'contact' => 'required|string|in:email,mobile',
-        // ];
+        try {
+            $carbon = Carbon::createFromFormat('H:i:s', $timeString);
+        } catch (\Exception $e) {
+            try {
+                $carbon = Carbon::createFromFormat('H:i', $timeString);
+            } catch (\Exception $e2) {
+                return 0; // fallback
+            }
+        }
 
-        $this->validate([
-            "contacts.$index.$field" => $rules[$field] ?? 'nullable',
-        ]);
+        return ($carbon->hour * 60) + $carbon->minute;
+    }
 
-        Corner::where('id', $contactData['id'])->update([
-            $field => strtolower($value),
-        ]);
+    /**
+     * Converte minutos inteiros para formato time 'HH:MM' ou 'HH:MM:SS'
+     */
+    private function minutesToTime($totalMinutes, $withSeconds = false)
+    {
+        $hours = intdiv($totalMinutes, 60);
+        $minutes = $totalMinutes % 60;
+
+        if ($withSeconds) {
+            return sprintf('%02d:%02d:00', $hours, $minutes);
+        }
+
+        return sprintf('%02d:%02d', $hours, $minutes);
     }
 }

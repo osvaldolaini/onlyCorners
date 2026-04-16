@@ -25,7 +25,7 @@
     {{-- Lista de Escanteios --}}
     <div class="mx-auto">
         @foreach ($corners as $index => $corner)
-            <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 shadow-xl"
+            <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 shadow-xl mb-2"
                 wire:key="corner-{{ $corner->id }}">
 
                 <!-- Cabeçalho -->
@@ -57,7 +57,6 @@
                         <div>
                             <label class="block text-gray-400 text-sm font-medium mb-3">ESCANTEIO A FAVOR DE</label>
                             <div class="grid grid-cols-2 gap-4">
-
                                 <!-- Time da Casa -->
                                 <button wire:click="updateCornerTeam({{ $corner->id }}, {{ $corner->team?->id }})"
                                     class="cursor-pointer p-4 rounded-3xl border-2 transition-all flex flex-col items-center gap-3
@@ -94,7 +93,9 @@
                                         {{ $corner->opponent?->nick ?? 'Time Visitante' }}
                                     </p>
                                 </button>
-
+                                <div class="col-span-2 text-gray-600 text-sm">
+                                    {{ $corner->code }}
+                                </div>
                             </div>
                         </div>
 
@@ -126,11 +127,18 @@
                                         class="cursor-pointer w-11 h-11 flex items-center justify-center text-3xl text-gray-400 hover:text-white hover:bg-gray-800 rounded-2xl transition-all">
                                         −
                                     </button>
-
-                                    <div class="flex-1 text-center">
-                                        <input type="number" wire:model.live="corners.{{ $index }}.minute"
+                                    <!-- Input com apenas os minutos -->
+                                    {{-- <div class="flex-1 text-center relative">
+                                        <input type="number" wire:model="{{ $corner->min }}" min="0"
+                                            max="120"
                                             class="w-full text-4xl font-bold text-white bg-transparent text-center focus:outline-none tabular-nums">
-                                        <span class="text-gray-500 text-lg">'</span>
+                                        <span
+                                            class="text-gray-500 text-lg absolute right-1/2 translate-x-1/2 bottom-1">'</span>
+                                    </div> --}}
+                                    <div class="flex-1 text-center">
+                                        <span class="text-green-500 text-lg">
+                                            {{ $corner->min }}
+                                        </span>
                                     </div>
 
                                     <button wire:click="incrementMinute({{ $corner->id }})"
