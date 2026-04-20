@@ -72,10 +72,15 @@
                             {{ $item->hour }}
                         </td>
                         <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
-                            {{ $item->team->nick }}
+                            {{ $item->team->nick }} <span class="badge badge-success">
+                                {{ $item->corners_home() }}
+                            </span>
                         </td>
                         <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                             {{ $item->opponent->nick }}
+                            <span class="badge badge-success">
+                                {{ $item->corners_visitor() }}
+                            </span>
                         </td>
                         <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                             {{ $item->championship->nick }}

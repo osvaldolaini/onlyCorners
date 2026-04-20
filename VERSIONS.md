@@ -10,3 +10,8 @@
 -   Cadastro de time
 -   Cadastro de campeonatos
 -   Cadastro de jogos
+-   Escantaios
+
+-   Primeiro algoritmo
+-   Algoritimo de verificação
+-   Gráfico

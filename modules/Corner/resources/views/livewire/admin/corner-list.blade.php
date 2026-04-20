@@ -22,6 +22,15 @@
         </button>
     </div>
 
+
+    <div class="mt-6">
+        @if (isset($this->resultado))
+            <pre class="bg-gray-900 text-green-400 p-4 overflow-auto text-sm">
+                {{ json_encode($this->resultado, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}
+            </pre>
+        @endif
+    </div>
+
     {{-- Lista de Escanteios --}}
     <div class="mx-auto">
         @foreach ($corners as $index => $corner)
@@ -71,7 +80,7 @@
                                         @endif
                                     </div>
                                     <p class="font-medium text-white text-sm text-center line-clamp-1">
-                                        {{ $corner->team?->title ?? 'Time Casa' }}
+                                        {{ $corner->team?->nick ?? 'Time Casa' }}
                                     </p>
                                 </button>
 

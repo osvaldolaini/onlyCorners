@@ -29,7 +29,7 @@ class GameList extends Component
     public $model = "Modules\Game\App\Models\Game"; //Model principal
     public $modelId = "games.id"; //Ex: 'table.id' or 'id'
     public $search;
-    public $sorts = ['games.date' => 'asc'];
+    public $sorts = ['games.date' => 'desc'];
     public $relationTables =  "teams,teams.id,games.team_id | championships,championships.id,games.championship_id";
     public $customSearch;  //Colunas personalizadas, customizar no model
     public $columnsInclude = 'games.date,games.hour,games.opponent_id,games.team_id,games.championship_id,championships.logo_path,championships.nick,teams.logo_path,teams.nick,games.active as status';

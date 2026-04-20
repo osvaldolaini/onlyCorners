@@ -80,6 +80,14 @@ class Game extends Model
     {
         return $this->hasMany(Corner::class, 'game_id', 'id')->where('active', 1);
     }
+    public function corners_home()
+    {
+        return $this->corners->where('favored_id', $this->team_id)->count();
+    }
+    public function corners_visitor()
+    {
+        return $this->corners->where('favored_id', $this->opponent_id)->count();
+    }
 
     public function championship(): BelongsTo
     {

@@ -5,10 +5,6 @@ namespace Modules\Corner\App\Livewire\Admin;
 use Livewire\Component;
 use Modules\Corner\App\Models\Corner;
 use Modules\Game\App\Models\Game;
-
-use Illuminate\Validation\Rule;
-use Livewire\Attributes\On;
-
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -34,6 +30,9 @@ class CornerList extends Component
         $this->half = $game->half;
         $this->favored_id = $game->favored_id;
     }
+
+
+
     public function render()
     {
         return view('corner::livewire.admin.corner-list')->layout('layouts.' . $this->layout);
@@ -42,6 +41,7 @@ class CornerList extends Component
             ->orderBy('min', 'desc')
             ->get();
     }
+
 
     public function incrementMinute(Corner $corner)
     {
@@ -59,6 +59,7 @@ class CornerList extends Component
 
         $this->loadCorners();
     }
+
     public function decrementMinute(Corner $corner)
     {
         $currentMinutes = $this->getMinutesFromTime($corner->min ?? '00:00');

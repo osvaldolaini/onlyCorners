@@ -83,6 +83,16 @@
                     Jogos
                 </x-slot>
             </x-layouts.admin.side-bar-nav-link>
+            {{-- JOGOS --}}
+            <x-layouts.admin.side-bar-nav-link url="predictions-list" active="*previsões*" access_page="predictions">
+                <x-slot name="svg">
+                    <x-layout.svg.soccer class="size-6">
+                    </x-layout.svg.soccer>
+                </x-slot>
+                <x-slot name="title">
+                    Previsões
+                </x-slot>
+            </x-layouts.admin.side-bar-nav-link>
 
 
             {{-- ADMINISTRAÇÃO --}}

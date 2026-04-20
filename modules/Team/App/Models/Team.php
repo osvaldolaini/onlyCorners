@@ -61,9 +61,9 @@ class Team extends Model
             }
         }
     }
-    public function setTitleAttribute($value)
+    public function setNickAttribute($value)
     {
-        $this->attributes['title'] = mb_strtoupper($value);
+        $this->attributes['nick'] = mb_strtoupper($value);
         $this->attributes['slug'] = 'only-corners-' . Str::slug($value);
     }
 
