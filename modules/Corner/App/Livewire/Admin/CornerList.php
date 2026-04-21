@@ -8,6 +8,10 @@ use Modules\Game\App\Models\Game;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
+use Exception;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+
 class CornerList extends Component
 {
     // Define o layout a ser usado
@@ -40,6 +44,110 @@ class CornerList extends Component
             ->with(['team', 'opponent'])   // carrega os relacionamentos necessários
             ->orderBy('min', 'desc')
             ->get();
+    }
+    public function getSofaScore()
+    {
+
+        $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe"; // ou caminho absoluto se necessário
+        $script = base_path("python\get_only_corner.py");
+
+
+        $command = [
+            $pythonExecutable,
+            $script,
+        ];
+
+        // Criar uma nova instância de Process
+        $process = new Process($command);
+
+        $process->setTimeout(120);        // ou 180 segundos
+        // $process->setTimeout(null);    // sem timeout (cuidado em produção)
+
+        $process->setInput(json_encode($this->game->id));
+
+
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            dd($process->getErrorOutput());
+        }
+
+        $output = $process->getOutput();
+
+        $decoded = json_decode($output, true);
+
+        if ($decoded['success']) {
+            // dd($decoded);
+            foreach ($decoded['results'] as $corners) {
+                // dd($corners['home_corners']);
+                if ($corners['home_corners'] > 0) {
+                    for ($i = 0; $i < $corners['home_corners']; $i++) {
+                        Corner::create([
+                            'active'            => 1,
+                            'date'              => $this->game->date,
+                            'hour'              => $this->game->hour,
+                            'game_id'           => $this->game->id,
+                            'team_id'           => $this->game->team_id,
+                            'opponent_id'       => $this->game->opponent_id,
+                            'championship_id'   => $this->game->championship_id,
+                            'favored_id'        => $this->game->team_id,
+                            'code'              => Str::uuid(),
+                        ]);
+                    }
+                }
+                if ($corners['away_corners'] > 0) {
+                    for ($i = 0; $i < $corners['away_corners']; $i++) {
+                        Corner::create([
+                            'active'            => 1,
+                            'date'              => $this->game->date,
+                            'hour'              => $this->game->hour,
+                            'game_id'           => $this->game->id,
+                            'team_id'           => $this->game->team_id,
+                            'opponent_id'       => $this->game->opponent_id,
+                            'championship_id'   => $this->game->championship_id,
+                            'favored_id'        => $this->game->opponent_id,
+                            'code'              => Str::uuid(),
+                        ]);
+                    }
+                }
+            }
+        } else {
+            dd('Sem escanteios');
+        }
+
+        $this->loadCorners();
+    }
+    public function generateCardsFromPython(array $gamesMarkets): array
+    {
+
+        $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe"; // ou caminho absoluto se necessário
+        $script = base_path("python\bet_engine.py");
+
+
+        $command = [
+            $pythonExecutable,
+            $script,
+        ];
+
+        // Criar uma nova instância de Process
+        $process = new Process($command);
+
+        $process->setTimeout(120);        // ou 180 segundos
+        // $process->setTimeout(null);    // sem timeout (cuidado em produção)
+
+        $process->setInput(json_encode($gamesMarkets));
+
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            dd($process->getErrorOutput());
+        }
+
+        $output = $process->getOutput();
+
+        $decoded = json_decode($output, true);
+        // $this->normalizePythonResponse($decoded);
+        return $this->normalizePythonResponse($decoded) ?? [];
     }
 
 
