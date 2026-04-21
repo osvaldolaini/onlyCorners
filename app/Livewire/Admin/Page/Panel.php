@@ -14,10 +14,14 @@ class Panel extends Component
     public $config;
     public $teams;
     public $championships;
-    public $chart;
-    public $labels;
-    public $wins;
-    public $losses;
+
+    public $labelsMonth = [];
+    public $winsMonth = [];
+    public $lossesMonth = [];
+
+    public $labels = [];
+    public $wins = [];
+    public $losses = [];
     // Define o layout a ser usado
     protected $layout = 'app';
 
@@ -26,11 +30,38 @@ class Panel extends Component
         $this->teams = Team::where('active', 1)->get()->count();
         $this->championships = Championship::where('active', 1)->get()->count();
         $this->config = Settings::find(1);
-        $this->chart = $this->chart();
+
+        $this->chart();
+        $this->chartByType();
     }
     public function render()
     {
         return view('livewire.admin.page.panel')->layout('layouts.' . $this->layout);
+    }
+    public function chartByType()
+    {
+        $types = ['safe', 'medium', 'aggressive'];
+
+        $labels = [];
+        $wins = [];
+        $losses = [];
+
+        foreach ($types as $type) {
+
+            $labels[] = ucfirst($type);
+
+            $wins[] = Prediction::where('type', $type)
+                ->where('status', 'won')
+                ->count();
+
+            $losses[] = Prediction::where('type', $type)
+                ->where('status', 'lost')
+                ->count();
+        }
+
+        $this->labels = $labels;
+        $this->wins = $wins;
+        $this->losses = $losses;
     }
 
     public function chart()
@@ -40,7 +71,6 @@ class Panel extends Component
         $wins = [];
         $losses = [];
 
-        // últimos 6 meses
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
 
@@ -55,20 +85,17 @@ class Panel extends Component
             $start = \Carbon\Carbon::parse($month)->startOfMonth();
             $end   = \Carbon\Carbon::parse($month)->endOfMonth();
 
-            $winCount = Prediction::whereBetween('created_at', [$start, $end])
+            $wins[] = Prediction::whereBetween('created_at', [$start, $end])
                 ->where('status', 'won')
                 ->count();
 
-            $lossCount = Prediction::whereBetween('created_at', [$start, $end])
+            $losses[] = Prediction::whereBetween('created_at', [$start, $end])
                 ->where('status', 'lost')
                 ->count();
-
-            $wins[] = $winCount;
-            $losses[] = $lossCount;
         }
 
-        $this->labels = $labels;
-        $this->wins = $wins;
-        $this->losses = $losses;
+        $this->labelsMonth = $labels;
+        $this->winsMonth = $wins;
+        $this->lossesMonth = $losses;
     }
 }

@@ -12,6 +12,7 @@
     </x-layouts.breadcrumb>
 
 
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         @foreach ($cards as $card)
@@ -46,13 +47,13 @@
             @switch($card['status'])
                 @case('won')
                     @php
-                        $bg = 'bg-green-500';
+                        $bg = 'bg-green-400';
                     @endphp
                 @break
 
                 @case('lost')
                     @php
-                        $bg = 'bg-red-500';
+                        $bg = 'bg-red-400';
                     @endphp
                 @break
 
@@ -62,68 +63,69 @@
 
                 @default
             @endswitch
-            <div class="border-2 {{ $border }} rounded-lg p-4 shadow {{ $bg }} ">
+            <div
+                class="border-2 {{ $border }} rounded-2xl p-6 shadow-lg {{ $bg }} hover:shadow-xl transition">
 
-                {{-- 🔹 HEADER DO CARD --}}
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="font-bold text-lg capitalize">
-                        {{ $card['type'] }}
-                    </h2>
-                    <span class="cursor-pointer btn btn-outline btn-success"
-                        wire:click='showModal({{ $card['id'] }})'>Detalhes</span>
-                    <span class="badge badge-md badge-info text-sm ">
-                        {{ $card['total_matches'] }} jogos
-                    </span>
-                </div>
+                {{-- 🔹 HEADER --}}
+                <div class="flex justify-between items-center mb-5">
 
-                {{-- 🔹 ODDS --}}
-                <div class="mb-3 text-sm">
                     <div>
-                        <strong>Odd total:</strong> {{ number_format($card['total_odds'], 2) }}
+                        <h2 class="text-xl font-bold capitalize">
+                            {{ $card['type'] }}
+                        </h2>
+                        <p class="text-xs text-gray-50">
+                            {{ $card['total_matches'] }} jogos
+                        </p>
                     </div>
-                    <div>
-                        <strong>Probabilidade:</strong> {{ number_format($card['total_prob'] * 100, 2) }}%
+
+                    <div class="flex items-center gap-2">
+                        <span class="cursor-pointer px-3 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200"
+                            wire:click='showModal({{ $card['id'] }})'>
+                            Detalhes
+                        </span>
                     </div>
+
                 </div>
 
-                {{-- 🔹 MATCHES --}}
-                <div class="space-y-2">
+                {{-- 🔹 ODD / PROB EM DESTAQUE --}}
+                <div class="grid grid-cols-2 gap-4 mb-6">
 
-                    @foreach (json_decode($card['matches'], true) as $match)
-                        <div class="border rounded p-2 text-sm bg-white">
-                            <div class="font-semibold">
-                                Jogo #{{ $match['game_id'] }} (
-                                <span>{{ $match['home_team'] }}</span>
-                                VS
-                                <span>{{ $match['away_team'] }}</span> )
-                            </div>
+                    <div class="bg-gray-50 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500">Odd Total</p>
+                        <p class="text-2xl font-bold text-green-600">
+                            {{ number_format($card['total_odds'], 2) }}
+                        </p>
+                    </div>
 
-                            <div>
-                                Tipo:
-                                {{ CornerMarketLabel::from($match['type'])->label() }}
-                            </div>
-
-                            <div>
-                                Odd: {{ $match['odd'] }}
-                            </div>
-
-                            <div>
-                                Prob: {{ number_format($match['probability'] * 100, 1) }}%
-                            </div>
-                            <div>
-                                Previsão: {{ $match['total_corners'] }}
-                            </div>
-                            <div>
-                                Escanteios: {{ $match['result_corners'] ?? '' }}
-                            </div>
-                            <div>
-                                Status: {{ $match['won'] ?? '' }}
-                            </div>
-
-                        </div>
-                    @endforeach
+                    <div class="bg-gray-50 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500">Probabilidade</p>
+                        <p class="text-2xl font-bold text-blue-600">
+                            {{ number_format($card['total_prob'] * 100, 1) }}%
+                        </p>
+                    </div>
 
                 </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    @php
+                        $validation = json_decode($card['validation'], true);
+                    @endphp
+                    <div class="bg-gray-50 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500">Acertos</p>
+                        <p class="text-2xl font-bold text-green-600">
+                            {{ $validation['hits'] ?? 0 }}
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500">Erros</p>
+                        <p class="text-2xl font-bold text-red-600">
+                            {{ $validation['misses'] ?? 0 }}
+                        </p>
+                    </div>
+
+                </div>
+
+
 
             </div>
         @endforeach
@@ -135,112 +137,164 @@
         <x-slot name="content">
             <dl class="text-gray-900 divide-y divide-gray-200 max-w ">
                 @if ($detail)
-                    <div class="p-4">
+                    @php
+                        $border = 'border-yellow-500';
+                    @endphp
+                    @switch($detail['type'])
+                        @case('safe')
+                            @php
+                                $border = 'border-green-500';
+                            @endphp
+                        @break
 
-                        {{-- HEADER --}}
-                        <div class="flex justify-between items-start mb-4">
+                        @case('medium')
+                            @php
+                                $border = 'border-yellow-500';
+                            @endphp
+                        @break
+
+                        @case('aggressive')
+                            @php
+                                $border = 'border-red-500';
+                            @endphp
+                        @break
+
+                        @php
+                            $border = 'border-yellow-500';
+                        @endphp
+
+                        @default
+                    @endswitch
+                    @switch($card['status'])
+                        @case('won')
+                            @php
+                                $bg = 'bg-green-300';
+                            @endphp
+                        @break
+
+                        @case('lost')
+                            @php
+                                $bg = 'bg-red-300';
+                            @endphp
+                        @break
+
+                        @php
+                            $bg = 'bg-white';
+                        @endphp
+
+                        @default
+                    @endswitch
+                    <div
+                        class="border-2 {{ $border }} rounded-2xl p-6 shadow-lg {{ $bg }} hover:shadow-xl transition">
+
+                        {{-- 🔹 HEADER --}}
+                        <div class="flex justify-between items-center mb-5">
 
                             <div>
-                                <h2 class="text-lg font-bold text-gray-50">
-                                    Card {{ $detail->code }}
+                                <h2 class="text-xl font-bold capitalize">
+                                    {{ $detail['type'] }}
                                 </h2>
-
-                                <p class="text-sm text-gray-500">
-                                    Tipo:
-                                    <span class="font-semibold uppercase">
-                                        {{ $detail->type }}
-                                    </span>
-                                </p>
-                            </div>
-
-                            <div class="text-right">
-                                <p class="text-sm text-gray-500">Odd Total</p>
-                                <p class="text-xl font-bold text-green-600">
-                                    {{ number_format($detail->total_odds, 2) }}
+                                <p class="text-xs text-gray-500">
+                                    {{ $detail['total_matches'] }} jogos
                                 </p>
                             </div>
 
                         </div>
 
-                        {{-- STATUS --}}
-                        <div class="mb-4">
-                            <span
-                                class="px-3 py-1 text-xs rounded-full
-                            @if ($detail->status == 'won') bg-green-100 text-green-700
-                            @elseif($detail->status == 'lost') bg-red-100 text-red-700
-                            @else bg-yellow-100 text-yellow-700 @endif
-                        ">
-                                {{ strtoupper($detail->status) }}
-                            </span>
+                        {{-- 🔹 ODD / PROB EM DESTAQUE --}}
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+
+                            <div class="bg-gray-50 rounded-xl p-4 text-center">
+                                <p class="text-xs text-gray-500">Odd Total</p>
+                                <p class="text-2xl font-bold text-green-600">
+                                    {{ number_format($detail['total_odds'], 2) }}
+                                </p>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-xl p-4 text-center">
+                                <p class="text-xs text-gray-500">Probabilidade</p>
+                                <p class="text-2xl font-bold text-blue-600">
+                                    {{ number_format($detail['total_prob'] * 100, 1) }}%
+                                </p>
+                            </div>
+
                         </div>
 
-                        {{-- MATCHES --}}
+                        {{-- 🔹 MATCHES --}}
                         <div class="space-y-4">
 
-                            @foreach (json_decode($detail->matches, true) as $match)
-                                <div class="border rounded-lg p-4 bg-gray-50">
+                            @foreach (json_decode($detail['matches'], true) as $match)
+                                <div
+                                    class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition">
 
-                                    {{-- HEADER DO JOGO --}}
+                                    {{-- HEADER MATCH --}}
                                     <div class="flex justify-between items-center mb-3">
 
-                                        <div class="font-semibold">
-                                            {{ $match['home_team'] ?? 'Home' }}
-                                            <span class="text-gray-400">vs</span>
-                                            {{ $match['away_team'] ?? 'Away' }}
+                                        <div class="text-xs text-gray-500">
+                                            Jogo #{{ $match['game_id'] }}
                                         </div>
 
                                         @if (isset($match['won']))
                                             <span
-                                                class="text-xs px-2 py-1 rounded
-                                            {{ $match['won'] ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
-                                                {{ $match['won'] ? 'GREEN' : 'RED' }}
+                                                class="text-xs px-3 py-1 rounded-full
+                                        {{ $match['won'] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                                {{ $match['won'] ? 'WIN' : 'LOSS' }}
+                                            </span>
+                                        @else
+                                            <span class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                                PENDING
                                             </span>
                                         @endif
 
                                     </div>
 
-                                    {{-- DADOS PRINCIPAIS --}}
-                                    <div class="grid grid-cols-3 gap-3 text-sm mb-3">
+                                    {{-- TIMES --}}
+                                    <div class="text-base font-semibold text-gray-800 mb-4">
+                                        {{ $match['home_team'] }}
+                                        <span class="text-gray-400 mx-2">vs</span>
+                                        {{ $match['away_team'] }}
+                                    </div>
 
-                                        <div>
-                                            <p class="text-gray-500">Previsão</p>
-                                            <p class="font-bold">
-                                                {{ $match['total_corners'] ?? '-' }}
-                                            </p>
-                                        </div>
+                                    {{-- INFO --}}
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
 
                                         <div>
                                             <p class="text-gray-500">Aposta</p>
-                                            <p class="font-bold text-blue-600 uppercase">
-                                                {{ str_replace('_', ' ', $match['bet'] ?? ($match['type'] ?? '-')) }}
+                                            <p class="font-semibold text-blue-600">
+                                                {{ CornerMarketLabel::from($match['type'])->label() }}
                                             </p>
                                         </div>
 
                                         <div>
                                             <p class="text-gray-500">Odd</p>
-                                            <p class="font-bold text-green-600">
-                                                {{ $match['odd'] ?? '-' }}
+                                            <p class="font-semibold text-green-600">
+                                                {{ number_format($match['odd'], 2) }}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-gray-500">Prob</p>
+                                            <p class="font-semibold">
+                                                {{ number_format($match['probability'] * 100, 1) }}%
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-gray-500">Previsão</p>
+                                            <p class="font-semibold">
+                                                {{ $match['total_corners'] ?? '-' }}
                                             </p>
                                         </div>
 
                                     </div>
 
                                     {{-- RESULTADO --}}
-                                    @isset($match['result_corners'])
-                                        <div class="text-sm mb-2">
-                                            <span class="text-gray-500">Escanteios:</span>
-                                            <span class="font-bold">
-                                                {{ $match['result_corners'] }}
-                                            </span>
-                                        </div>
-                                    @endisset
-
-                                    {{-- EXPLICAÇÃO --}}
-                                    @isset($match['explanation'])
-                                        <div class="text-xs text-gray-600 bg-white p-2 rounded border leading-relaxed">
-                                            {{ $match['explanation'] }}
-                                        </div>
-                                    @endisset
+                                    <div class="mt-4 text-sm">
+                                        <span class="text-gray-500">Escanteios reais:</span>
+                                        <span class="font-bold text-gray-800 ml-1">
+                                            {{ $match['result_corners'] ?? '-' }}
+                                        </span>
+                                    </div>
 
                                 </div>
                             @endforeach

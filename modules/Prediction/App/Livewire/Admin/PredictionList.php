@@ -57,21 +57,30 @@ class PredictionList extends Component
         if (!$games['success']) {
             return;
         }
+        // dd(($games));
+        if ((count($games['games'])) > 0) {
+            // 1️⃣ ANALISA JOGOS
+            $predictions = $statsService->analyzeGames(collect($games['games']));
 
-        // 1️⃣ ANALISA JOGOS
-        $predictions = $statsService->analyzeGames(collect($games['games']));
+            // 2️⃣ MONTA ENTRADA PARA PYTHON
+            $gamesMarkets = $this->buildGamesMarkets($predictions, $cornerService);
 
-        // 2️⃣ MONTA ENTRADA PARA PYTHON
-        $gamesMarkets = $this->buildGamesMarkets($predictions, $cornerService);
+            // 3️⃣ EXECUTA PYTHON
+            $pythonResponse = $cornerService->generateCardsFromPython($gamesMarkets);
 
-        // 3️⃣ EXECUTA PYTHON
-        $pythonResponse = $cornerService->generateCardsFromPython($gamesMarkets);
+            // 4️⃣ SALVA NO BANCO
+            $this->storePythonCards($pythonResponse);
 
-        // 4️⃣ SALVA NO BANCO
-        $this->storePythonCards($pythonResponse);
-
-        // 5️⃣ ATUALIZA LISTA
-        $this->cards = Prediction::where('status', 'pending')->get();
+            // 5️⃣ ATUALIZA LISTA
+            $this->cards = Prediction::where('status', 'pending')->get();
+        } else {
+            $this->openAlert('error', 'Não existem jogos no período.');
+        }
+    }
+    //MESSAGE
+    public function openAlert($status, $msg)
+    {
+        $this->dispatch('openAlert', $status, $msg);
     }
 
     // --------------------------------------------------------
@@ -169,16 +178,16 @@ class PredictionList extends Component
     {
         $startDate = Carbon::now()->startOfDay();
         $endDate = Carbon::now()->addDays(2)->endOfDay();
-        // $games = Game::whereBetween('date', ['2026-04-17', $endDate])
-        //     ->where('date', '>', '2026-04-18')
-        //     ->whereDoesntHave('corners')
-        //     ->orderBy('date')
-        //     ->get();
-        $games = Game::whereBetween('date', [$startDate, $endDate])
-            ->where('date', '>', Carbon::now())
+        $games = Game::whereBetween('date', ['2026-04-17', $endDate])
+            ->where('date', '>', '2026-04-17')
             ->whereDoesntHave('corners')
             ->orderBy('date')
             ->get();
+        // $games = Game::whereBetween('date', [$startDate, $endDate])
+        //     ->where('date', '>', Carbon::now())
+        //     ->whereDoesntHave('corners')
+        //     ->orderBy('date')
+        //     ->get();
         // dd($games);
         return [
             'success' => true,
@@ -268,7 +277,9 @@ class PredictionList extends Component
             $hits = 0;
             $misses = 0;
 
-            foreach (json_decode($matches, true) as $match) {
+            $matches = json_decode($matches, true);
+
+            foreach ($matches as $i => $match) {
 
                 $corners = \Modules\Corner\App\Models\Corner::where('game_id', $match['game_id'])->count();
 
@@ -277,12 +288,11 @@ class PredictionList extends Component
                     continue;
                 }
 
-                // 🔥 atualiza histórico
-                $match['result_corners'] = $corners;
+                $matches[$i]['result_corners'] = $corners;
 
                 $won = $this->checkBetResult($match['type'], $corners);
 
-                $match['won'] = $won;
+                $matches[$i]['won'] = $won;
 
                 if ($won) {
                     $hits++;
@@ -291,6 +301,8 @@ class PredictionList extends Component
                     $allWon = false;
                 }
             }
+
+            // dd($matches);
 
             // 🔥 status do card
             if ($hasPending) {
@@ -316,6 +328,7 @@ class PredictionList extends Component
     }
     private function checkBetResult($bet, $total)
     {
+        // dd($bet, $total);
         return match (true) {
 
             // 🔹 OVER

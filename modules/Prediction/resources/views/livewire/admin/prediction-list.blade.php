@@ -45,88 +45,111 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         @foreach ($cards as $card)
             @php
-                $border = 'border-yellow-500';
+                $border = match ($card['type']) {
+                    'safe' => 'border-green-500',
+                    'medium' => 'border-yellow-500',
+                    'aggressive' => 'border-red-500',
+                    default => 'border-gray-300',
+                };
             @endphp
-            @switch($card['type'])
-                @case('safe')
-                    @php
-                        $border = 'border-green-500';
-                    @endphp
-                @break
 
-                @case('medium')
-                    @php
-                        $border = 'border-yellow-500';
-                    @endphp
-                @break
+            <div class="border-2 {{ $border }} rounded-2xl p-6 shadow-lg bg-white hover:shadow-xl transition">
 
-                @case('aggressive')
-                    @php
-                        $border = 'border-red-500';
-                    @endphp
-                @break
+                {{-- 🔹 HEADER --}}
+                <div class="flex justify-between items-start mb-5">
 
-                @php
-                    $border = 'border-yellow-500';
-                @endphp
+                    <div>
+                        <h2 class="text-xl font-bold capitalize">
+                            {{ $card['type'] }}
+                        </h2>
+                        <p class="text-xs text-gray-500">
+                            {{ $card['total_matches'] }} jogos
+                        </p>
+                    </div>
 
-                @default
-            @endswitch
-            <div class="border-2 {{ $border }} rounded-lg p-4 shadow bg-white ">
+                    <button wire:click='showModal({{ $card['id'] }})'
+                        class="text-xs px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 transition">
+                        Detalhes
+                    </button>
 
-                {{-- 🔹 HEADER DO CARD --}}
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="font-bold text-lg capitalize">
-                        {{ $card['type'] }}
-                    </h2>
-                    <span class="cursor-pointer btn btn-outline btn-success"
-                        wire:click='showModal({{ $card['id'] }})'>Detalhes</span>
-                    <span class="badge badge-md badge-info text-sm ">
-                        {{ $card['total_matches'] }} jogos
-                    </span>
                 </div>
 
-                {{-- 🔹 ODDS --}}
-                <div class="mb-3 text-sm">
-                    <div>
-                        <strong>Odd total:</strong> {{ number_format($card['total_odds'], 2) }}
+                {{-- 🔹 ODD / PROB --}}
+                <div class="grid grid-cols-2 gap-4 mb-6">
+
+                    <div class="bg-gray-200 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500">Odd Total</p>
+                        <p class="text-2xl font-bold text-green-600">
+                            {{ number_format($card['total_odds'], 2) }}
+                        </p>
                     </div>
-                    <div>
-                        <strong>Probabilidade:</strong> {{ number_format($card['total_prob'] * 100, 2) }}%
+
+                    <div class="bg-gray-200 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500">Probabilidade</p>
+                        <p class="text-2xl font-bold text-blue-600">
+                            {{ number_format($card['total_prob'] * 100, 1) }}%
+                        </p>
                     </div>
+
                 </div>
 
                 {{-- 🔹 MATCHES --}}
-                <div class="space-y-2">
+                <div class="space-y-4">
 
                     @foreach (json_decode($card['matches'], true) as $match)
-                        <div class="border rounded p-2 text-sm">
+                        <div class="bg-gray-200 border border-gray-100 rounded-xl p-4 hover:bg-gray-100 transition">
 
-                            <div class="font-semibold">
-                                Jogo #{{ $match['game_id'] }} (
-                                <span>{{ $match['home_team'] }}</span>
-                                VS
-                                <span>{{ $match['away_team'] }}</span> )
+                            {{-- HEADER MATCH --}}
+                            <div class="flex justify-between items-center mb-2">
+
+                                <div class="text-xs text-gray-500">
+                                    Jogo #{{ $match['game_id'] }}
+                                </div>
+
                             </div>
 
-                            <div>
-                                Tipo:
-                                {{ CornerMarketLabel::from($match['type'])->label() }}
+                            {{-- TIMES --}}
+                            <div class="font-semibold text-gray-800 mb-3">
+                                {{ $match['home_team'] }}
+                                <span class="text-gray-400 mx-1">vs</span>
+                                {{ $match['away_team'] }}
                             </div>
 
-                            <div>
-                                Odd: {{ $match['odd'] }}
-                            </div>
+                            {{-- INFO --}}
+                            <div class="grid grid-cols-2 gap-3 text-sm">
 
-                            <div>
-                                Prob: {{ number_format($match['probability'] * 100, 1) }}%
-                            </div>
-                            <div>
-                                Prev: {{ $match['total_corners'] }}
+                                <div>
+                                    <p class="text-gray-500">Aposta</p>
+                                    <p class="font-semibold text-blue-600">
+                                        {{ CornerMarketLabel::from($match['type'])->label() }}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p class="text-gray-500">Odd</p>
+                                    <p class="font-semibold text-green-600">
+                                        {{ number_format($match['odd'], 2) }}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p class="text-gray-500">Prob</p>
+                                    <p class="font-semibold">
+                                        {{ number_format($match['probability'] * 100, 1) }}%
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p class="text-gray-500">Previsão</p>
+                                    <p class="font-semibold">
+                                        {{ $match['total_corners'] ?? '-' }}
+                                    </p>
+                                </div>
+
                             </div>
 
                         </div>

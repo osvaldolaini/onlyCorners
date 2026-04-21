@@ -90,6 +90,9 @@ class CornerPredictionService
         // Criar uma nova instância de Process
         $process = new Process($command);
 
+        $process->setTimeout(120);        // ou 180 segundos
+        // $process->setTimeout(null);    // sem timeout (cuidado em produção)
+
         $process->setInput(json_encode($gamesMarkets));
 
         $process->run();

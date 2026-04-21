@@ -179,7 +179,7 @@ def main():
                 # Visitante
                 for i in range(away_corners):
                     detalhado.append({
-                        "match_id": match_id,
+                        "game_id": match_id,
                         "date": data_formatada,
                         "hour": hora_formatada,
                         "team_id": home_team,

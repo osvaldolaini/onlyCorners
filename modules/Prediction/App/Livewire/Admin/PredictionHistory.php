@@ -9,7 +9,7 @@ class PredictionHistory extends Component
 {
     protected $layout = 'app';
 
-    public $breadcrumb = 'Previsões';
+    public $breadcrumb = 'Histórico de previsões';
     public $cards = [];
 
     public $showModalShow = false;
@@ -22,5 +22,12 @@ class PredictionHistory extends Component
 
         return view('prediction::livewire.admin.prediction-history')
             ->layout('layouts.' . $this->layout);
+    }
+    public function showModal($id)
+    {
+        $this->showModalShow = true;
+        // dd();
+        $this->detail = Prediction::find($id);
+        // dd($this->detail, $id);
     }
 }

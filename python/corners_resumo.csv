@@ -1,4 +1,4 @@
-match_id,date,hour,home_team,home_team_id,away_team,away_team_id,home_corners,away_corners
+game_id,date,hour,home_team,home_team_id,away_team,away_team_id,home_corners,away_corners
 15237889,2026-01-28,19:00:00,atletico-mineiro,1977,palmeiras,1963,5,7
 15237891,2026-01-28,19:00:00,coritiba,1982,red-bull-bragantino,1999,1,5
 15237890,2026-01-28,19:00:00,internacional,1966,athletico,1967,13,1
