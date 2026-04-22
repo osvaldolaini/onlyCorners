@@ -1,0 +1,84 @@
+import sys
+import json
+import requests
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0"
+}
+
+
+def get_statistics(event_id):
+    url = f"https://api.sofascore.com/api/v1/event/{event_id}/statistics"
+    response = requests.get(url, headers=HEADERS, timeout=10)
+    return response.json()
+
+    print(json.dumps({
+            "success": True,
+            "results": response
+        }))
+
+def extract_corners_by_period(stats):
+    result = {
+        "home_first_half": 0,
+        "away_first_half": 0,
+        "home_second_half": 0,
+        "away_second_half": 0,
+        "home_total": 0,
+        "away_total": 0
+    }
+
+    statistics = stats.get("statistics", [])
+    return statistics
+
+    if not statistics:
+        print("⚠️ Nenhuma estatística encontrada")
+        return result
+
+    for period_data in statistics:
+        period = period_data.get("period")
+
+        for group in period_data.get("groups", []):
+            for stat in group.get("statisticsItems", []):
+
+                # 🔥 MUITO MAIS SEGURO
+                if stat.get("key") == "cornerKicks":
+
+                    home = int(stat.get("homeValue", 0))
+                    away = int(stat.get("awayValue", 0))
+
+                    if period == "1ST":
+                        result["home_first_half"] = home
+                        result["away_first_half"] = away
+
+                    elif period == "2ND":
+                        result["home_second_half"] = home
+                        result["away_second_half"] = away
+
+                    elif period == "ALL":
+                        result["home_total"] = home
+                        result["away_total"] = away
+
+    # fallback caso ALL não venha
+    if result["home_total"] == 0 and result["away_total"] == 0:
+        result["home_total"] = result["home_first_half"] + result["home_second_half"]
+        result["away_total"] = result["away_first_half"] + result["away_second_half"]
+
+    return result
+
+# ------------------------------------------------------------
+# TESTE DIRETO
+# ------------------------------------------------------------
+if __name__ == "__main__":
+    raw_input = sys.stdin.read().strip()
+
+    try:
+        payload = json.loads(raw_input)
+        event_id = payload.get("event_id")
+    except Exception as e:
+        print(json.dumps({"error": "invalid_json", "message": str(e)}))
+        sys.exit(1)
+
+    stats = get_statistics(event_id)
+    corners = extract_corners_by_period(stats)
+
+    print(json.dumps(corners))

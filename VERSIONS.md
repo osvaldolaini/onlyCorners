@@ -4,7 +4,7 @@
 
 > Novo
 
--   Script para pegar escanteios do sofascore na aba corners.
+-   Script para pegar escanteios do sofascore na aba corners por tempo de jogo.
 
 ## Versão Charles muller (beta) "2026-04-10"
 

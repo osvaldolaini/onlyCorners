@@ -45,6 +45,17 @@ class CornerList extends Component
             ->orderBy('min', 'desc')
             ->get();
     }
+
+    public function cleanCorners()
+    {
+        if ($this->corners) {
+            foreach ($this->corners as $corner) {
+                $corner->delete();
+            }
+        }
+
+        $this->loadCorners();
+    }
     public function getSofaScore()
     {
 
@@ -77,11 +88,14 @@ class CornerList extends Component
         $decoded = json_decode($output, true);
 
         if ($decoded['success']) {
-            // dd($decoded);
+
             foreach ($decoded['results'] as $corners) {
-                // dd($corners['home_corners']);
-                if ($corners['home_corners'] > 0) {
-                    for ($i = 0; $i < $corners['home_corners']; $i++) {
+
+                // =====================
+                // 🟢 CASA - 1º TEMPO
+                // =====================
+                if ($corners['home_first_half'] > 0) {
+                    for ($i = 0; $i < $corners['home_first_half']; $i++) {
                         Corner::create([
                             'active'            => 1,
                             'date'              => $this->game->date,
@@ -91,12 +105,37 @@ class CornerList extends Component
                             'opponent_id'       => $this->game->opponent_id,
                             'championship_id'   => $this->game->championship_id,
                             'favored_id'        => $this->game->team_id,
+                            'half'              => 'first',
                             'code'              => Str::uuid(),
                         ]);
                     }
                 }
-                if ($corners['away_corners'] > 0) {
-                    for ($i = 0; $i < $corners['away_corners']; $i++) {
+
+                // =====================
+                // 🔵 CASA - 2º TEMPO
+                // =====================
+                if ($corners['home_second_half'] > 0) {
+                    for ($i = 0; $i < $corners['home_second_half']; $i++) {
+                        Corner::create([
+                            'active'            => 1,
+                            'date'              => $this->game->date,
+                            'hour'              => $this->game->hour,
+                            'game_id'           => $this->game->id,
+                            'team_id'           => $this->game->team_id,
+                            'opponent_id'       => $this->game->opponent_id,
+                            'championship_id'   => $this->game->championship_id,
+                            'favored_id'        => $this->game->team_id,
+                            'half'              => 'second',
+                            'code'              => Str::uuid(),
+                        ]);
+                    }
+                }
+
+                // =====================
+                // 🔴 VISITANTE - 1º TEMPO
+                // =====================
+                if ($corners['away_first_half'] > 0) {
+                    for ($i = 0; $i < $corners['away_first_half']; $i++) {
                         Corner::create([
                             'active'            => 1,
                             'date'              => $this->game->date,
@@ -106,6 +145,27 @@ class CornerList extends Component
                             'opponent_id'       => $this->game->opponent_id,
                             'championship_id'   => $this->game->championship_id,
                             'favored_id'        => $this->game->opponent_id,
+                            'half'              => 'first',
+                            'code'              => Str::uuid(),
+                        ]);
+                    }
+                }
+
+                // =====================
+                // 🟡 VISITANTE - 2º TEMPO
+                // =====================
+                if ($corners['away_second_half'] > 0) {
+                    for ($i = 0; $i < $corners['away_second_half']; $i++) {
+                        Corner::create([
+                            'active'            => 1,
+                            'date'              => $this->game->date,
+                            'hour'              => $this->game->hour,
+                            'game_id'           => $this->game->id,
+                            'team_id'           => $this->game->team_id,
+                            'opponent_id'       => $this->game->opponent_id,
+                            'championship_id'   => $this->game->championship_id,
+                            'favored_id'        => $this->game->opponent_id,
+                            'half'              => 'second',
                             'code'              => Str::uuid(),
                         ]);
                     }

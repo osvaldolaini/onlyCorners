@@ -12,11 +12,17 @@
 
     {{-- Botão Adicionar Novo Escanteio --}}
     <div class="flex justify-center my-8">
+        <button wire:click="cleanCorners"
+            class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-red-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
+            <span>Apagar todos escanteio</span>
+            <x-layout.svg.trash class="w-5 h-5 ">
+            </x-layout.svg.trash>
+        </button>
         <button wire:click="addRow"
             class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
             <span>Adicionar escanteio</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
         </button>

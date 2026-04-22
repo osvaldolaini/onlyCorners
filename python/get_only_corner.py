@@ -3,7 +3,9 @@ import json
 import requests
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": "Mozilla/5.0",
+    "Accept": "application/json",
+    "Referer": "https://www.sofascore.com/"
 }
 
 
@@ -12,33 +14,67 @@ HEADERS = {
 # =========================
 def get_statistics(event_id):
     url = f"https://api.sofascore.com/api/v1/event/{event_id}/statistics"
+
     response = requests.get(url, headers=HEADERS, timeout=10)
+
+    if response.status_code != 200:
+        raise Exception(f"HTTP {response.status_code}")
+
     return response.json()
 
 
 # =========================
-# EXTRAI ESCANTEIOS
+# EXTRAI ESCANTEIOS POR TEMPO
 # =========================
-def extract_corners(stats):
+def extract_corners_by_period(stats):
+    result = {
+        "home_first_half": 0,
+        "away_first_half": 0,
+        "home_second_half": 0,
+        "away_second_half": 0,
+        "home_total": 0,
+        "away_total": 0
+    }
+
     try:
-        groups = stats.get("statistics", [])
+        periods = stats.get("statistics", [])
 
-        for group in groups:
-            for item in group.get("groups", []):
-                for stat in item.get("statisticsItems", []):
+        if not periods:
+            return None
 
-                    name = stat.get("name", "").lower()
+        for period_data in periods:
+            period = period_data.get("period")
 
-                    if name == "corner kicks":
-                        return {
-                            "home": int(stat.get("home", 0)),
-                            "away": int(stat.get("away", 0))
-                        }
+            for group in period_data.get("groups", []):
+                for stat in group.get("statisticsItems", []):
+
+                    # MAIS CONFIÁVEL QUE "name"
+                    if stat.get("key") == "cornerKicks":
+
+                        home = int(stat.get("homeValue", 0))
+                        away = int(stat.get("awayValue", 0))
+
+                        if period == "1ST":
+                            result["home_first_half"] = home
+                            result["away_first_half"] = away
+
+                        elif period == "2ND":
+                            result["home_second_half"] = home
+                            result["away_second_half"] = away
+
+                        elif period == "ALL":
+                            result["home_total"] = home
+                            result["away_total"] = away
+
+        # fallback caso não venha "ALL"
+        if result["home_total"] == 0 and result["away_total"] == 0:
+            result["home_total"] = result["home_first_half"] + result["home_second_half"]
+            result["away_total"] = result["away_first_half"] + result["away_second_half"]
+
+        return result
 
     except Exception as e:
         return {"error": str(e)}
-
-    return None
 
 
 # =========================
@@ -50,13 +86,16 @@ def process_events(event_ids):
     for event_id in event_ids:
         try:
             stats = get_statistics(event_id)
-            corners = extract_corners(stats)
 
-            if corners:
+            # DEBUG (se quiser ver o retorno bruto)
+            # print(json.dumps(stats, indent=2))
+
+            corners = extract_corners_by_period(stats)
+
+            if corners and "error" not in corners:
                 results.append({
                     "event_id": event_id,
-                    "home_corners": corners["home"],
-                    "away_corners": corners["away"]
+                    **corners
                 })
             else:
                 results.append({
@@ -83,8 +122,8 @@ if __name__ == "__main__":
         data = json.loads(raw_input)
 
         # aceita:
-        # 1 -> único id
-        # [1,2,3] -> vários ids
+        # 123
+        # [123,456,789]
         if isinstance(data, int):
             event_ids = [data]
         elif isinstance(data, list):
