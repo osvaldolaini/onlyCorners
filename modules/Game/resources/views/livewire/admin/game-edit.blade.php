@@ -16,8 +16,11 @@
 
                 <x-table.button-back route="{{ $back }}"></x-table.button-back>
             </x-slot>
+
             <x-slot name="content">
+
                 <div id="tab1" x-show="activeTab === '#tab1'" class="block">
+
                     <div role="tabpanel"
                         class="p-6 border-2 rounded-r-lg rounded-bl-lg bg-base-100 border-base-300 dark:bg-gray-700 dark:text-gray-100">
                         <div class="grid grid-cols-2 gap-2 mb-1 sm:grid-cols-6 sm:gap-3 sm:mb-5">

@@ -172,8 +172,11 @@ class CornerList extends Component
                 }
             }
         } else {
-            dd('Sem escanteios');
+            $this->openAlert('error', 'Nenhum jogo encontrado.');
+            // dd('Sem jogos');
         }
+
+        $this->openAlert('success', 'Registros inseridos/atualizados com sucesso.');
 
         $this->loadCorners();
     }

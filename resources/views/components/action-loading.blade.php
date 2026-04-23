@@ -472,14 +472,18 @@
             }
         }
     </style>
-    <div wire:target="refreshPublic,refreshPrivate,refreshAircrafts"  class="fixed w-full h-screen top-0 right-0 z-50 items-center justify-items-center
-    bg-blue-900 bg-opacity-50 backdrop-brightness-50 backdrop-blur-sm " wire:loading>
-        <div  class="relative flex flex-col items-center max-w-lg gap-4 p-6 rounded-md top-40
-        shadow-md sm:py-8 sm:px-12 bg-blue-900 text-gray-100 mx-auto">
+    <div wire:target="getSofaScore"
+        class="fixed w-full h-screen top-0 right-0 z-50 items-center justify-items-center
+    bg-blue-900 bg-opacity-50 backdrop-brightness-50 backdrop-blur-sm "
+        wire:loading>
+        <div
+            class="relative flex flex-col items-center max-w-lg gap-4 p-6 rounded-md top-40
+        shadow-md sm:py-8 sm:px-12 bg-opacity-50 bg-blue-900 text-gray-100 mx-auto">
             <div style="color: #64d6e2" class="la-timer la-3x">
                 <div></div>
             </div>
-            <h2 class="text-2xl font-semibold leadi tracki">Atualizando<span class="loading loading-dots loading-xs"></span></h2>
+            <h2 class="text-2xl font-semibold leadi tracki">Atualizando<span
+                    class="loading loading-dots loading-xs"></span></h2>
             {{-- <p class="flex-1 text-center text-white">Aguarde o envio dos emails.</p> --}}
         </div>
     </div>

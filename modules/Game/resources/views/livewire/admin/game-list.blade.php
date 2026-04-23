@@ -1,4 +1,5 @@
 <div>
+    <x-action-loading></x-action-loading>
     <x-layouts.breadcrumb>
         <x-slot name="left">
             <h3 class="text-2xl font-bold tracki dark:text-gray-50">
@@ -22,6 +23,15 @@
     </x-table.search>
     <x-table.table>
         <x-slot name="head">
+            <div class="w-full flex items-center justify-center">
+                <button wire:click="getSofaScore"
+                    class="flex text-center items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
+                    <span>Adicionar jogos SofaScore</span>
+                    <x-layout.svg.search class="w-5 h-5 ">
+                    </x-layout.svg.search>
+                </button>
+            </div>
+
             <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr scope="col" class="text-gray-500 dark:text-gray-400">
                     <th scope="col" wire:click="addSort('date')"

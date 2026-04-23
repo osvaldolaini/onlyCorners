@@ -6,7 +6,6 @@ use Livewire\Component;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 
-
 use Illuminate\Support\Str;
 use Modules\Game\App\Models\Game;
 

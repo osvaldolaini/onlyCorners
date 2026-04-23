@@ -2,6 +2,7 @@
     @php
         use Carbon\Carbon;
     @endphp
+    <x-action-loading></x-action-loading>
     <x-layouts.breadcrumb>
         <x-slot name="left">
             <h3 class="text-2xl font-bold tracking-tight dark:text-gray-50">
@@ -21,18 +22,14 @@
         <button wire:click="addRow"
             class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
             <span>Adicionar escanteio</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <x-layout.svg.plus class="w-5 h-5 ">
+            </x-layout.svg.plus>
         </button>
         <button wire:click="getSofaScore"
             class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
-            <span>Adicionar escanteio SofaScore</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <span>Buscar escanteio SofaScore</span>
+            <x-layout.svg.search class="w-5 h-5 ">
+            </x-layout.svg.search>
         </button>
     </div>
 

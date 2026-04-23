@@ -10,6 +10,7 @@ use Livewire\Attributes\On;
 use Illuminate\Support\Str;
 use Modules\Game\App\Models\Game;
 
+
 class GameEdit extends Component
 {
     // Define o layout a ser usado
@@ -43,6 +44,8 @@ class GameEdit extends Component
             $this->championship_id      = $game->championship_id;
         }
     }
+
+
 
     public function render()
     {

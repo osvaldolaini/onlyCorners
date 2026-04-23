@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('championships', function (Blueprint $table) {
             $table->id();
+            $table->integer('sofascore_id');
             $table->string('active');
             $table->string('slug')->nullable();
             $table->string('title')->nullable();
