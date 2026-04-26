@@ -71,6 +71,7 @@ def main():
     try:
         tournament_id = int(raw_input)
 
+        # seasons = get_seasons(tournament_id)
         seasons = get_seasons(tournament_id)
 
         if not seasons:

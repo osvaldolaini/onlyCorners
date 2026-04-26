@@ -8,6 +8,10 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Modules\Championship\App\Models\Championship;
 
+use Exception;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+
 class ChampionshipList extends Component
 {
     // Define o layout a ser usado
@@ -38,13 +42,13 @@ class ChampionshipList extends Component
     public $paginate = 15; //Qtd de registros por página
     public $active = 'active';
 
-    public $country = ;
+    public $country = '';
 
     public function getSofaScore()
     {
 
         $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe"; // ou caminho absoluto se necessário
-        $script = base_path("python\get_only_games.py");
+        $script = base_path("python\get_only_tornament_laravel.py");
 
 
         $command = [
@@ -57,8 +61,7 @@ class ChampionshipList extends Component
 
         $process->setTimeout(120);        // ou 180 segundos
         // $process->setTimeout(null);    // sem timeout (cuidado em produção)
-
-        $process->setInput($this->tornament_id);
+        $process->setInput('13'); // Brasil
 
 
         $process->run();
@@ -70,27 +73,27 @@ class ChampionshipList extends Component
         $output = $process->getOutput();
 
         $decoded = json_decode($output, true);
-
+        dd($decoded);
 
         if ($decoded['success']) {
 
-            foreach ($decoded['results'] as $game) {
+            // foreach ($decoded['results'] as $game) {
 
-                $home_team_id = Team::where('sofascore_id', $game['home_team_id'])->first()->id;
-                $game = Game::updateOrCreate([
-                    'id'    => $game['event_id'],
-                ], [
-                    'active'            => 1,
-                    'date'              =>  $game['date'],
-                    'hour'              =>  $game['hour'],
-                    'team_id'           => $home_team_id,
-                    'opponent_id'       => $away_team_id,
-                    'championship_id'   => $this->tornament_id,
-                    'code'              => Str::uuid(),
-                ]);
-                $this->tot += 1;
-                // dd($game);
-            }
+            //     $home_team_id = Team::where('sofascore_id', $game['home_team_id'])->first()->id;
+            //     $game = Game::updateOrCreate([
+            //         'id'    => $game['event_id'],
+            //     ], [
+            //         'active'            => 1,
+            //         'date'              =>  $game['date'],
+            //         'hour'              =>  $game['hour'],
+            //         'team_id'           => $home_team_id,
+            //         'opponent_id'       => $away_team_id,
+            //         'championship_id'   => $this->tornament_id,
+            //         'code'              => Str::uuid(),
+            //     ]);
+            //     $this->tot += 1;
+            //     // dd($game);
+            // }
         } else {
             $this->openAlert('error', 'Nenhum jogo encontrado.');
             // dd('Sem jogos');

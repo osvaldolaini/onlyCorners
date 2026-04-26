@@ -29,6 +29,7 @@ class PredictionList extends Component
         $this->cards = Prediction::where('status', 'pending')
             ->orderByDesc('created_at')
             ->get();
+        // dd($this->cards);
 
         return view('prediction::livewire.admin.prediction-list')
             ->layout('layouts.' . $this->layout);
@@ -178,16 +179,16 @@ class PredictionList extends Component
     {
         $startDate = Carbon::now()->startOfDay();
         $endDate = Carbon::now()->addDays(2)->endOfDay();
-        $games = Game::whereBetween('date', ['2026-04-17', $endDate])
-            ->where('date', '>', '2026-04-17')
-            ->whereDoesntHave('corners')
-            ->orderBy('date')
-            ->get();
-        // $games = Game::whereBetween('date', [$startDate, $endDate])
-        //     ->where('date', '>', Carbon::now())
+        // $games = Game::whereBetween('date', ['2026-04-24', $endDate])
+        //     ->where('date', '>', '2026-04-24')
         //     ->whereDoesntHave('corners')
         //     ->orderBy('date')
         //     ->get();
+        $games = Game::whereBetween('date', [$startDate, $endDate])
+            ->where('date', '>=', Carbon::now())
+            ->whereDoesntHave('corners')
+            ->orderBy('date')
+            ->get();
         // dd($games);
         return [
             'success' => true,

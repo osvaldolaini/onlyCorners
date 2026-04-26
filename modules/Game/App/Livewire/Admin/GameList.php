@@ -68,7 +68,6 @@ class GameList extends Component
 
         $process->setInput($this->tornament_id);
 
-
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -79,11 +78,8 @@ class GameList extends Component
 
         $decoded = json_decode($output, true);
 
-
         if ($decoded['success']) {
-
             foreach ($decoded['results'] as $game) {
-
                 $home_team_id = Team::where('sofascore_id', $game['home_team_id'])->first()->id;
                 $away_team_id = Team::where('sofascore_id', $game['away_team_id'])->first()->id;
                 $game = Game::updateOrCreate([
@@ -100,13 +96,12 @@ class GameList extends Component
                 $this->tot += 1;
                 // dd($game);
             }
+
+            $this->openAlert('success', 'Registros inseridos/atualizados com sucesso.');
         } else {
             $this->openAlert('error', 'Nenhum jogo encontrado.');
             // dd('Sem jogos');
         }
-
-
-        $this->openAlert('success', 'Registros inseridos/atualizados com sucesso.');
     }
 
 

@@ -33,7 +33,7 @@ class TeamList extends Component
     public $relationTables; //Relacionamentos ( table , key , foreingKey )
     public $customSearch;  //Colunas personalizadas, customizar no model
     public $columnsInclude = 'title,nick,code,country,logo_path,active as status';
-    public $searchable = 'title,nick'; //Colunas pesquisadas no banco de dados
+    public $searchable = 'title,nick,country'; //Colunas pesquisadas no banco de dados
 
     public $paginate = 15; //Qtd de registros por página
     public $active = 'active';

@@ -1,16 +1,27 @@
-<div id="main-header" class="bg-white/80 shadow transition duration-300">
-    <div class="container mx-auto flex items-center justify-between px-4 py-8">
+<div id="main-header" style="background: linear-gradient(90deg, #4db17d 0%, #2f9e9e 50%, #4db17d 100%);"
+    class="shadow transition duration-300">
+
+    <div class="container mx-auto flex items-center justify-between px-4 py-2">
 
         {{-- Logo --}}
-        <a href="{{ url('/') }}" class="text-xl font-bold text-indigo-600">
-            {{ $settings->title ?? 'Minha Empresa' }}
-        </a>
+        <div>
+            @props(['width' => 'h-24 sm:h-16'])
+            <picture>
+                <source srcset="{{ url('storage/logos/logo.png') }}" />
+                <source srcset="{{ url('storage/logos/logo.webp') }}" />
+                <img class="{{ $width }}" src="{{ url('storage/logos/logo.png') }}" alt="only-corners">
+            </picture>
+
+        </div>
 
         {{-- Menu Desktop --}}
         <nav class="hidden md:flex space-x-6">
-            <a href="{{ url('/') }}" class="text-gray-700 hover:text-indigo-600">Início</a>
-            <a href="{{ url('/sobre') }}" class="text-gray-700 hover:text-indigo-600">Sobre</a>
-            <a href="{{ url('/contato') }}" class="text-gray-700 hover:text-indigo-600">Contato</a>
+            <a href="{{ url('/') }}"
+                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Início</a>
+            <a href="{{ url('/sobre') }}"
+                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Sobre</a>
+            <a href="{{ url('/contato') }}"
+                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Contato</a>
         </nav>
 
         {{-- Botão menu mobile --}}

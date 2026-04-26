@@ -26,7 +26,7 @@
             <div class="w-full flex items-center justify-center">
                 <button wire:click="getSofaScore"
                     class="flex text-center items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
-                    <span>Adicionar jogos SofaScore</span>
+                    <span>Adicionar ligas/campeonatos SofaScore</span>
                     <x-layout.svg.search class="w-5 h-5 ">
                     </x-layout.svg.search>
                 </button>

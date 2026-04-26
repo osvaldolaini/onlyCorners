@@ -56,6 +56,7 @@ class CornerList extends Component
 
         $this->loadCorners();
     }
+
     public function getSofaScore()
     {
 
@@ -86,7 +87,7 @@ class CornerList extends Component
         $output = $process->getOutput();
 
         $decoded = json_decode($output, true);
-
+        dd($decoded);
         if ($decoded['success']) {
 
             foreach ($decoded['results'] as $corners) {

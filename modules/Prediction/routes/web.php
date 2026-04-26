@@ -20,6 +20,6 @@ Route::middleware(['auth', 'verified', 'web'])->group(function () {
     Route::get('predictions/prediction-historico', PredictionHistory::class)
         ->name('prediction-history');
 
-    Route::get('predictions/prediction-edit/{{predictions}}/editar', PredictionEdit::class)
+    Route::get('predictions/prediction-edit/{predictions}/editar', PredictionEdit::class)
         ->name('prediction-edit');
 });
