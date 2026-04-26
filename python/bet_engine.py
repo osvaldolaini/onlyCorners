@@ -8,7 +8,7 @@ from collections import defaultdict, Counter
 # CONFIGURAÇÕES
 # ------------------------------------------------------------
 MAX_GAMES_PER_CARD = 5
-MAX_CARDS_PER_CATEGORY = 30
+MAX_CARDS_PER_CATEGORY = 10
 MAX_USES_PER_GAME = 3
 
 # 🔥 NOVO: Limites mínimos de probabilidade por nível

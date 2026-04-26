@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('predictions', function (Blueprint $table) {
             $table->id();
             $table->string('type');           // Ex: BLOCO-001, COMBO-12-03
-
+            $table->dateTime('expired')->nullable();
             $table->string('code')->unique();           // Ex: BLOCO-001, COMBO-12-03
             $table->string('hash')->unique();           // Ex: BLOCO-001, COMBO-12-03
             $table->tinyInteger('total_matches')->default(3);          // 3 ou 4

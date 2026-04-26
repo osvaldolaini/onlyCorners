@@ -58,15 +58,16 @@ class TableService
             $query->whereYear('date', $this->filterYear);
         }
 
-        if (in_array('admin', Auth::user()->jsonGroups) or in_array('super_admin', Auth::user()->jsonGroups)) {
-            if (Auth::user()->see_excluded) {
-                $query->where($this->active, '<=', 1);
-            } else {
-                $query->where($this->active,  1);
-            }
-        } else {
-            $query->where($this->active,  1);
-        }
+        // if (in_array('admin', Auth::user()->jsonGroups) or in_array('super_admin', Auth::user()->jsonGroups)) {
+        //     if (Auth::user()->see_excluded) {
+        //         $query->where($this->active, '<=', 1);
+        //     } else {
+        //         $query->where($this->active,  1);
+        //     }
+        // } else {
+        //     $query->where($this->active,  1);
+        // }
+        $query->where($this->active,  1);
         if ($this->where) {
             foreach ($this->where as $key => $value) {
                 $query->where($key,  $value);

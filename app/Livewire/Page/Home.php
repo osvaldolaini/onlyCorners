@@ -47,8 +47,8 @@ class Home extends Component
     public function loadBets()
     {
         $query = Prediction::where('status', 'pending')
+            ->where('expired', '>', now())
             ->orderByDesc('created_at');
-
 
         if (!empty($this->risks)) {
             $query->whereIn('type', $this->risks);

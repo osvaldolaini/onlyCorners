@@ -158,6 +158,15 @@ class PredictionList extends Component
                     continue;
                 }
 
+                $games = collect($matches);
+
+                // pega a menor data entre os jogos
+                $earliestGame = $games->min(function ($game) {
+                    return isset($game['start_time'])
+                        ? Carbon::parse($game['start_time'])
+                        : null;
+                });
+
                 Prediction::create([
                     'code' => $this->generateUniqueCode(),
                     'type' => $type,
@@ -166,7 +175,8 @@ class PredictionList extends Component
                     'total_prob' => $card['total_probability'],
                     'matches' => json_encode($matches),
                     'hash' => $hash,
-                    'status' => 'pending'
+                    'status' => 'pending',
+                    'expired' => $earliestGame, // 🔥 aqui
                 ]);
             }
         }

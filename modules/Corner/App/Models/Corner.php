@@ -99,6 +99,10 @@ class Corner extends Model
     {
         return $this->belongsTo(Team::class, 'opponent_id', 'id')->where('active', 1);
     }
+    public function favored(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'favored_id', 'id')->where('active', 1);
+    }
 
     //Register Log
     public function getActivitylogOptions(): LogOptions

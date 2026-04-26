@@ -10,6 +10,7 @@ class Prediction extends Model
 
     protected $fillable = [
         'status',
+        'expired',
         'total_matches',
         'total_odds',
         'total_prob',

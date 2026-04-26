@@ -78,7 +78,7 @@
 
                 @foreach ($betsFormatted as $bet)
                     <div
-                        class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow hover:shadow-md transition
+                        class="bg-gray-800 rounded-xl p-4 shadow hover:shadow-md transition
                     border-l-4
                     {{ $bet['risk'] == 'safe' ? 'border-green-500' : '' }}
                     {{ $bet['risk'] == 'medium' ? 'border-yellow-500' : '' }}
@@ -89,10 +89,10 @@
                         <div class="flex justify-between items-center mb-3">
 
                             <div>
-                                <h2 class="text-sm font-bold text-gray-800 dark:text-white uppercase">
+                                <h2 class="text-sm font-bold text-white uppercase">
                                     {{ CardLevelLabel::from($bet['risk'])->label() }}
                                 </h2>
-                                <p class="text-xs text-gray-500">
+                                <p class="text-xs text-gray-300">
                                     {{ count($bet['games']) }} jogos
                                 </p>
                             </div>
@@ -127,12 +127,12 @@
                         <div class="space-y-1 text-xs">
 
                             @foreach (array_slice($bet['games'], 0, 5) as $game)
-                                <div class="flex justify-between items-center text-gray-700 dark:text-gray-300">
+                                <div class="flex justify-between items-center text-gray-300">
 
                                     <div class="flex flex-col truncate max-w-[60%]">
                                         <span class="truncate text-sm font-medium">
                                             {{ $game['home_team'] }}
-                                            <span class="text-gray-400 mx-1">vs</span>
+                                            <span class="text-gray-300 mx-1">vs</span>
                                             {{ $game['away_team'] }}
                                         </span>
 
@@ -152,7 +152,7 @@
                             @endforeach
 
                             @if (count($bet['games']) > 5)
-                                <p class="text-gray-400 text-xs mt-1">
+                                <p class="text-gray-300 text-xs mt-1">
                                     +{{ count($bet['games']) - 5 }} jogos
                                 </p>
                             @endif
@@ -190,7 +190,6 @@
             <dl class="text-gray-900 divide-y divide-gray-200 max-w ">
                 @if ($detail)
                     <div class="p-4">
-
                         {{-- HEADER --}}
                         <div class="flex justify-between items-start mb-4">
 
@@ -218,10 +217,7 @@
 
                         {{-- STATUS --}}
                         <div class="mb-4">
-                            <span
-                                class="px-3 py-1 text-xs rounded-full
-                      bg-yellow-100 text-yellow-700 
-                        ">
+                            <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 ">
                                 Aguardando jogo
                             </span>
                         </div>

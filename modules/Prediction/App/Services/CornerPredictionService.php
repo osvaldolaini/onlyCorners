@@ -22,7 +22,7 @@ class CornerPredictionService
             ['type' => 'over_8_5',  'odd' => 1.25],
             ['type' => 'over_9_5',  'odd' => 1.40],
             ['type' => 'over_10_5', 'odd' => 1.60],
-            // ['type' => 'over_11_5', 'odd' => 1.85],
+            ['type' => 'over_11_5', 'odd' => 1.85],
         ];
 
         $underLines = [
@@ -31,7 +31,7 @@ class CornerPredictionService
             ['type' => 'under_11_5', 'odd' => 1.40],
             ['type' => 'under_10_5', 'odd' => 1.55],
             ['type' => 'under_9_5',  'odd' => 1.75],
-            // ['type' => 'under_8_5',  'odd' => 2.05],
+            ['type' => 'under_8_5',  'odd' => 2.05],
         ];
 
         $calcProbability = function ($line, $isOver) use ($totalCorners) {

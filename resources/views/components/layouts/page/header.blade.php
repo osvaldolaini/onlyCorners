@@ -18,10 +18,12 @@
         <nav class="hidden md:flex space-x-6">
             <a href="{{ url('/') }}"
                 class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Início</a>
+            <a href="{{ route('all-corners') }}"
+                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Escanteios</a>
+            <a href="{{ url('/resultados') }}"
+                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Resultados</a>
             <a href="{{ url('/sobre') }}"
                 class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Sobre</a>
-            <a href="{{ url('/contato') }}"
-                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Contato</a>
         </nav>
 
         {{-- Botão menu mobile --}}

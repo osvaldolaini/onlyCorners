@@ -1,29 +1,31 @@
-<footer class="bg-gray-900 text-white mt-auto py-8">
+<footer class=" text-gray-900 mt-auto py-8"
+    style="background: linear-gradient(90deg, #4db17d 0%, #2f9e9e 50%, #4db17d 100%);">
     <div class="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
 
         <div>
             <h3 class="font-semibold mb-3">Sobre Nós</h3>
-            <p class="text-gray-400 text-sm">
+            <p class="text-gray-700 text-sm">
                 Software especialisado em dados, estatísticas e palpites sobre escanteios.
             </p>
         </div>
 
         <div>
             <h3 class="font-semibold mb-3">Contato</h3>
-            <ul class="text-gray-400 text-sm space-y-1">
+            {{-- <ul class="text-gray-700 text-sm space-y-1">
                 <li>📞 {{ $contact->phone ?? '(00) 0000-0000' }}</li>
                 <li>✉️ {{ $contact->email ?? 'contato@empresa.com' }}</li>
                 <li>📍 {{ $contact->address ?? 'Endereço não informado' }}</li>
-            </ul>
+            </ul> --}}
         </div>
 
         <div>
             <h3 class="font-semibold mb-3">Redes Sociais</h3>
             <ul class="flex space-x-4">
-                <li><a href="{{ $social->facebook ?? '#' }}" target="_blank" class="hover:text-blue-500">Facebook</a></li>
+                {{-- <li><a href="{{ $social->facebook ?? '#' }}" target="_blank" class="hover:text-blue-500">Facebook</a>
+                </li>
                 <li><a href="{{ $social->twitter ?? '#' }}" target="_blank" class="hover:text-sky-400">Twitter</a></li>
                 <li><a href="{{ $social->instagram ?? '#' }}" target="_blank" class="hover:text-pink-500">Instagram</a>
-                </li>
+                </li> --}}
             </ul>
         </div>
 

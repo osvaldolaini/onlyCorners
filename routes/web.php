@@ -6,6 +6,7 @@ use App\Livewire\Admin\Settings\Logs;
 use App\Livewire\Admin\Settings\Settings;
 use App\Livewire\Admin\Users\UserForm;
 use App\Livewire\Admin\Users\UserList;
+use App\Livewire\Page\AllCorners;
 use App\Livewire\Page\DetailPage;
 use App\Livewire\Page\Home;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ use Livewire\Volt\Volt;
 
 Route::get('/', Home::class)->name('home');
 Route::get('/detalhes/{predictions}', DetailPage::class)->name('detail');
+Route::get('/todos-escanteios', AllCorners::class)->name('all-corners');
 
 // Route::view('dashboard', 'dashboard')
 //     ->middleware(['auth', 'verified'])
