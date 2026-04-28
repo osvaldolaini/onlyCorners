@@ -24,12 +24,38 @@
     <x-table.table>
         <x-slot name="head">
             <div class="w-full flex items-center justify-center">
-                <button wire:click="getSofaScore"
+                {{-- <button wire:click="getSofaScore"
                     class="flex text-center items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
                     <span>Adicionar jogos SofaScore</span>
                     <x-layout.svg.search class="w-5 h-5 ">
                     </x-layout.svg.search>
-                </button>
+                </button> --}}
+                <div class="flex items-center gap-3">
+
+                    {{-- SELECT DE CAMPEONATOS --}}
+                    <select wire:model="tornament_id"
+                        class="px-4 py-3 bg-gray-800 text-white border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                        <option value="">Selecione um campeonato</option>
+
+                        @foreach ($tournaments as $tournament)
+                            <option value="{{ $tournament->id }}">
+                                {{ $tournament->nick }}
+                            </option>
+                        @endforeach
+
+                    </select>
+
+                    {{-- BOTÃO --}}
+                    <button wire:click="getSofaScore"
+                        class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
+
+                        <span>Buscar jogos</span>
+
+                        <x-layout.svg.search class="w-5 h-5"></x-layout.svg.search>
+                    </button>
+
+                </div>
             </div>
 
             <thead class="bg-gray-50 dark:bg-gray-800">

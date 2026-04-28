@@ -11,6 +11,7 @@ use Modules\Game\App\Models\Game;
 use Illuminate\Support\Str;
 
 use Exception;
+use Modules\Championship\App\Models\Championship;
 use Modules\Team\App\Models\Team;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -47,6 +48,7 @@ class GameList extends Component
 
     public $tornament_id = 325;
     public $tot = 0;
+    public $tournaments;
 
     public function getSofaScore()
     {
@@ -77,22 +79,25 @@ class GameList extends Component
         $output = $process->getOutput();
 
         $decoded = json_decode($output, true);
-
+        // dd($decoded);
         if ($decoded['success']) {
             foreach ($decoded['results'] as $game) {
                 $home_team_id = Team::where('sofascore_id', $game['home_team_id'])->first()->id;
                 $away_team_id = Team::where('sofascore_id', $game['away_team_id'])->first()->id;
-                $game = Game::updateOrCreate([
-                    'id'    => $game['event_id'],
-                ], [
-                    'active'            => 1,
-                    'date'              =>  $game['date'],
-                    'hour'              =>  $game['hour'],
-                    'team_id'           => $home_team_id,
-                    'opponent_id'       => $away_team_id,
-                    'championship_id'   => $this->tornament_id,
-                    'code'              => Str::uuid(),
-                ]);
+                if ($game['date'] > date('Y-m-d')) {
+                    $game = Game::updateOrCreate([
+                        'id'    => $game['event_id'],
+                    ], [
+                        'active'            => 1,
+                        'date'              =>  $game['date'],
+                        'hour'              =>  $game['hour'],
+                        'team_id'           => $home_team_id,
+                        'opponent_id'       => $away_team_id,
+                        'championship_id'   => $this->tornament_id,
+                        'code'              => Str::uuid(),
+                    ]);
+                }
+
                 $this->tot += 1;
                 // dd($game);
             }
@@ -103,7 +108,10 @@ class GameList extends Component
             // dd('Sem jogos');
         }
     }
-
+    public function mount()
+    {
+        $this->tournaments = Championship::where('active', 1)->get();
+    }
 
     #[On('see_excluded')]
     public function render(TableService $queryService)

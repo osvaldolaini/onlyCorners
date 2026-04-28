@@ -57,12 +57,11 @@ class CornerList extends Component
         $this->loadCorners();
     }
 
+
     public function getSofaScore()
     {
-
         $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe"; // ou caminho absoluto se necessário
         $script = base_path("python\get_only_corner.py");
-
 
         $command = [
             $pythonExecutable,
@@ -87,9 +86,10 @@ class CornerList extends Component
         $output = $process->getOutput();
 
         $decoded = json_decode($output, true);
-        dd($decoded);
+        // dd($decoded);
         if ($decoded['success']) {
-
+            //deleta os antigos
+            $this->cleanCorners();
             foreach ($decoded['results'] as $corners) {
 
                 // =====================

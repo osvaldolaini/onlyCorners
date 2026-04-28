@@ -1,26 +1,26 @@
 import sys
 import json
-import requests
+from playwright.sync_api import sync_playwright
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept": "application/json",
-    "Referer": "https://www.sofascore.com/"
-}
+
+# =========================
+# FETCH VIA BROWSER
+# =========================
+def fetch_json(page, url):
+    try:
+        response = page.goto(url, wait_until="networkidle")
+        text = response.text()
+        return json.loads(text)
+    except:
+        return {}
 
 
 # =========================
 # BUSCA ESTATÍSTICAS
 # =========================
-def get_statistics(event_id):
+def get_statistics(page, event_id):
     url = f"https://api.sofascore.com/api/v1/event/{event_id}/statistics"
-
-    response = requests.get(url, headers=HEADERS, timeout=10)
-
-    if response.status_code != 200:
-        raise Exception(f"HTTP {response.status_code}")
-
-    return response.json()
+    return fetch_json(page, url)
 
 
 # =========================
@@ -48,7 +48,6 @@ def extract_corners_by_period(stats):
             for group in period_data.get("groups", []):
                 for stat in group.get("statisticsItems", []):
 
-                    # MAIS CONFIÁVEL QUE "name"
                     if stat.get("key") == "cornerKicks":
 
                         home = int(stat.get("homeValue", 0))
@@ -66,7 +65,7 @@ def extract_corners_by_period(stats):
                             result["home_total"] = home
                             result["away_total"] = away
 
-        # fallback caso não venha "ALL"
+        # fallback
         if result["home_total"] == 0 and result["away_total"] == 0:
             result["home_total"] = result["home_first_half"] + result["home_second_half"]
             result["away_total"] = result["away_first_half"] + result["away_second_half"]
@@ -80,15 +79,15 @@ def extract_corners_by_period(stats):
 # =========================
 # PROCESSAMENTO PRINCIPAL
 # =========================
-def process_events(event_ids):
+def process_events(page, event_ids):
     results = []
 
     for event_id in event_ids:
         try:
-            stats = get_statistics(event_id)
+            stats = get_statistics(page, event_id)
 
-            # DEBUG (se quiser ver o retorno bruto)
-            # print(json.dumps(stats, indent=2))
+            # pequena pausa ajuda a evitar bloqueio
+            page.wait_for_timeout(300)
 
             corners = extract_corners_by_period(stats)
 
@@ -121,9 +120,6 @@ if __name__ == "__main__":
     try:
         data = json.loads(raw_input)
 
-        # aceita:
-        # 123
-        # [123,456,789]
         if isinstance(data, int):
             event_ids = [data]
         elif isinstance(data, list):
@@ -131,7 +127,21 @@ if __name__ == "__main__":
         else:
             raise Exception("Formato inválido")
 
-        results = process_events(event_ids)
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            )
+
+            page = context.new_page()
+
+            # 🔥 ESSENCIAL (gera cookies reais)
+            page.goto("https://www.sofascore.com", wait_until="domcontentloaded")
+
+            results = process_events(page, event_ids)
+
+            browser.close()
 
         print(json.dumps({
             "success": True,

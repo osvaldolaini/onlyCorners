@@ -39,7 +39,6 @@ class Team extends Model
             $model->setUpperCaseAttributes([
                 'title',
                 'nick',
-                'country',
                 'updated_by',
                 'created_by',
             ]);

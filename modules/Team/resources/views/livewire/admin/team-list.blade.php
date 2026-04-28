@@ -1,4 +1,7 @@
 <div>
+    @php
+        use App\Enums\CountryLeague;
+    @endphp
     <x-layouts.breadcrumb>
         <x-slot name="left">
             <h3 class="text-2xl font-bold tracki dark:text-gray-50">
@@ -74,7 +77,7 @@
                             {{ $item->nick }}
                         </td>
                         <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
-                            {{ $item->country }}
+                            {{ CountryLeague::from($item->country)->label() }}
                         </td>
                         <td class="w-1/6 px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                             <x-table.table-options id='{{ $item->id }}' active='{{ $item->status }}'>
