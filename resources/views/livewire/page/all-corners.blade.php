@@ -30,14 +30,6 @@
                             </x-table.table-sort-button>
                         </th>
                         <th scope="col"
-                            class="px-4 py-1 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                            Minuto
-                        </th>
-                        <th scope="col"
-                            class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
-                            Favorecido
-                        </th>
-                        <th scope="col"
                             class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                             Campeonato
                         </th>
@@ -49,6 +41,18 @@
                             class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                             Tempo
                         </th>
+
+                        <th scope="col"
+                            class="px-4 py-1 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                            Minuto
+                        </th>
+
+
+
+                        <th scope="col"
+                            class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
+                            Favorecido
+                        </th>
                     </tr>
                 </thead>
             </x-slot>
@@ -59,24 +63,6 @@
                             <td
                                 class="items-center px-4 py-1 space-x-2 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
                                 {{ $item->f_date }}
-                            </td>
-                            <td
-                                class="items-center px-4 py-1 space-x-2 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                                {{ $item->min ?? 'Não informado' }}
-                            </td>
-                            <td
-                                class="flex justify-center items-center px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
-                                @if ($item->favored_id)
-                                    @if ($item->favored?->code_image)
-                                        <img src="{{ url('storage/teams/' . $item->favored->id . '/' . $item->favored->code_image . '_list.png') }}"
-                                            alt="{{ $item->favored->nick }}" class="w-10 h-10 object-contain">
-                                    @else
-                                        <x-application-logo width="h-14" />
-                                    @endif
-                                @else
-                                    Não informado
-                                @endif
-
                             </td>
                             <td
                                 class=" items-center mx-auto px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
@@ -133,6 +119,24 @@
                             </td>
                             <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                                 {{ $item->half ? ($item->half == 'first' ? '1º Tempo' : '2º Tempo') : 'Não informado' }}
+                            </td>
+                            <td
+                                class="items-center px-4 py-1 space-x-2 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
+                                {{ $item->min ?? 'Não informado' }}
+                            </td>
+                            <td
+                                class="flex justify-center items-center px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
+                                @if ($item->favored_id)
+                                    @if ($item->favored?->code_image)
+                                        <img src="{{ url('storage/teams/' . $item->favored->id . '/' . $item->favored->code_image . '_list.png') }}"
+                                            alt="{{ $item->favored->nick }}" class="w-10 h-10 object-contain">
+                                    @else
+                                        <x-application-logo width="h-14" />
+                                    @endif
+                                @else
+                                    Não informado
+                                @endif
+
                             </td>
                         </tr>
                     @endforeach

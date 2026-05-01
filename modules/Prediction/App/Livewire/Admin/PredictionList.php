@@ -5,6 +5,7 @@ namespace Modules\Prediction\App\Livewire\Admin;
 use App\Enums\CornerMarketLabel;
 use Carbon\Carbon;
 use Livewire\Component;
+use Modules\Championship\App\Models\Championship;
 use Modules\Game\App\Models\Game;
 use Modules\Prediction\App\Models\Prediction;
 use Modules\Prediction\App\Services\CornerPredictionService;
@@ -20,6 +21,15 @@ class PredictionList extends Component
 
     public $showModalShow = false;
     public $detail;
+    public $tournaments;
+    public $tornament_id;
+    public $date;
+
+    public function mount()
+    {
+        $this->tournaments = Championship::where('active', 1)->get();
+        // $this->getCornersSofaScore();
+    }
 
     // --------------------------------------------------------
     // 📄 RENDER
@@ -98,8 +108,6 @@ class PredictionList extends Component
             ];
         })->values()->toArray();
     }
-
-
 
     // --------------------------------------------------------
     // 🐍 SALVA OUTPUT DO PYTHON
@@ -189,21 +197,40 @@ class PredictionList extends Component
     {
         $startDate = Carbon::now()->startOfDay();
         $endDate = Carbon::now()->addDays(2)->endOfDay();
+        if ($this->date) {
+            $endDate = implode("-", array_reverse(explode("/", $this->date)));
+        }
+        // dd($endDate);
         // $games = Game::whereBetween('date', ['2026-04-24', $endDate])
         //     ->where('date', '>', '2026-04-24')
         //     ->whereDoesntHave('corners')
         //     ->orderBy('date')
         //     ->get();
-        $games = Game::whereBetween('date', [$startDate, $endDate])
-            ->where('date', '>=', Carbon::now())
-            ->whereDoesntHave('corners')
-            ->orderBy('date')
-            ->get();
-        // dd($games);
-        return [
-            'success' => true,
-            'games' => $games
-        ];
+        if ($this->tornament_id) {
+            // dd();
+            $games = Game::whereBetween('date', [$startDate, $endDate])
+                ->where('date', '>=', Carbon::now())
+                ->where('championship_id', $this->tornament_id)
+                ->whereDoesntHave('corners')
+                ->orderBy('date')
+                ->get();
+        } else {
+            $games = Game::whereBetween('date', [$startDate, $endDate])
+                ->where('date', '>=', Carbon::now())
+                // ->where('tornament_id', $this->tornament_id)
+                ->whereDoesntHave('corners')
+                ->orderBy('date')
+                ->get();
+        }
+
+        if ($games->count() > 3) {
+            return [
+                'success' => true,
+                'games' => $games
+            ];
+        } else {
+            $this->openAlert('error', 'Não existe o mínimo de jogos no período.');
+        }
     }
 
     // --------------------------------------------------------
@@ -242,8 +269,6 @@ class PredictionList extends Component
 
         return 'CARD-' . $date . '-' . str_pad($next, 3, '0', STR_PAD_LEFT);
     }
-
-
 
     public function generateExplanation(array $game): string
     {

@@ -69,6 +69,7 @@ class TableService
         // }
         $query->where($this->active,  1);
         if ($this->where) {
+            // $query->whereDoesntHave('corners');
             foreach ($this->where as $key => $value) {
                 $query->where($key,  $value);
             }

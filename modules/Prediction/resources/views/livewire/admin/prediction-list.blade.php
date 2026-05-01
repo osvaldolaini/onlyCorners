@@ -12,32 +12,58 @@
     </x-layouts.breadcrumb>
 
     {{-- Botão Adicionar Novo Escanteio --}}
-    <div class="grid grid-cols-3">
-        <div class="flex justify-center my-8">
-            <a href="{{ route('prediction-history') }}"
-                class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
-                <span>Histórico</span>
-                <x-layout.svg.archives class="w-5 h-5 text-white">
-                </x-layout.svg.archives>
+    <div class="grid grid-cols-6">
 
-            </a>
-        </div>
-        <div class="flex justify-center my-8">
+        <div class="col-span-4 flex justify-center my-8">
+            <div class="col-span-full sm:col-span-2 ">
+                <label class="block text-sm font-medium text-gray-900 dark:text-white" for="title">
+                    Data</label>
+                <input type="date" wire:model="date"
+                    class="px-4 py-3 bg-gray-800 text-white border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('date')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+            {{-- SELECT DE CAMPEONATOS --}}
+            <div class="col-span-full sm:col-span-2 ">
+                <label class="block text-sm font-medium text-gray-900 dark:text-white" for="title">
+                    Campeonatos</label>
+                <select wire:model="tornament_id"
+                    class="px-4 py-3 bg-gray-800 text-white border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <option value="">Selecione um campeonato</option>
+
+                    @foreach ($tournaments as $tournament)
+                        <option value="{{ $tournament->id }}">
+                            {{ $tournament->nick ?? '' }}
+                        </option>
+                    @endforeach
+
+                </select>
+            </div>
+
             <button wire:click="generatePredictions"
-                class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
+                class="cursor-pointer flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
                 <span>Gerar previsão</span>
                 <x-layout.svg.cogs class="w-5 h-5 ">
                 </x-layout.svg.cogs>
-
             </button>
         </div>
-        <div class="flex justify-center my-8">
+        <div class="col-span-1 flex justify-center my-8">
             <button wire:click="checkResults"
-                class="flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
+                class="cursor-pointer flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
                 <span>Verificar previsão</span>
                 <x-layout.svg.math class="w-5 h-5 ">
                 </x-layout.svg.math>
             </button>
+        </div>
+        <div class="col-span-1 flex justify-center my-8">
+            <a href="{{ route('prediction-history') }}"
+                class="cursor-pointer flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
+                <span>Histórico</span>
+                <x-layout.svg.archives class="w-5 h-5 text-white">
+                </x-layout.svg.archives>
+            </a>
         </div>
     </div>
 

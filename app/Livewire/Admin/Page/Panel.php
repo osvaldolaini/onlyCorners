@@ -6,6 +6,7 @@ use App\Models\Admin\Settings;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Modules\Championship\App\Models\Championship;
+use Modules\Corner\App\Models\Corner;
 use Modules\Prediction\App\Models\Prediction;
 use Modules\Team\App\Models\Team;
 
@@ -14,6 +15,7 @@ class Panel extends Component
     public $config;
     public $teams;
     public $championships;
+    public $corners;
 
     public $labelsMonth = [];
     public $winsMonth = [];
@@ -29,6 +31,7 @@ class Panel extends Component
     {
         $this->teams = Team::where('active', 1)->get()->count();
         $this->championships = Championship::where('active', 1)->get()->count();
+        $this->corners = Corner::where('active', 1)->get()->count();
         $this->config = Settings::find(1);
 
         $this->chart();

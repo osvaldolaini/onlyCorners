@@ -34,6 +34,26 @@
                 </div>
             </div>
         </a>
+        <div class="col-span-full sm:col-span-2">
+            <div class="relative h-32 overflow-hidden bg-blue-500 rounded-lg shadow-md">
+                <svg class="absolute w-24 h-24 text-blue-800 rounded-md opacity-50 -top-3 -right-6 md:-right-6"
+                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M5 1C4.44772 1 4 1.44772 4 2V22C4 22.5523 4.44772 23 5 23C5.55228 23 6 22.5523 6 22V15.693L18.8542 10.8727C20.5846 10.2238 20.5846 7.77627 18.8542 7.12739L6 2.30705V2C6 1.44772 5.55228 1 5 1ZM6 4.44305V13.557L17.6526 9.18732C17.8256 9.12243 17.8256 8.87767 17.6526 8.81278L6 4.44305Z"
+                        fill="currentColor" />
+                </svg>
+                <div class="p-4 ">
+                    <dl>
+                        <dt class="text-sm font-medium leading-5 text-white truncate">
+                            Escanteios
+                        </dt>
+                        <dd class="mt-1 text-5xl font-bold leading-9 text-white">
+                            {{ $corners }}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
         <div class="col-span-full sm:col-span-4"></div>
         <div class="col-span-full sm:col-span-3">
             <div class="w-full h-full p-0 m-0 text-gray-900 rounded-b-md ">

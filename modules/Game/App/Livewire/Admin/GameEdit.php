@@ -32,6 +32,7 @@ class GameEdit extends Component
 
     public $newImg = '';
 
+
     public function mount(Game $game)
     {
         // dd($game);
@@ -44,8 +45,6 @@ class GameEdit extends Component
             $this->championship_id      = $game->championship_id;
         }
     }
-
-
 
     public function render()
     {

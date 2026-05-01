@@ -1,154 +1,173 @@
-import requests
-import pandas as pd
+from playwright.sync_api import sync_playwright
+import csv
 import uuid
 from datetime import datetime
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0"
-}
-
-# =========================
-# CONFIGURE AQUI
-# 🇧🇷 Brasileirão → 325
-# 🇮🇹 Serie A (Itália) → 23
-# 🇪🇸 La Liga → 8
-# 🇬🇧 Premier League → 17
-# FR League 1 → 34
-# GR BundesLeague → 35
-# =========================
-TOURNAMENT_ID = 325  # 17 = Brasileirão | 23 = Itália
-
-# =========================
+LEAGUES = [8, 17, 23, 34, 35, 325]
+OUTPUT_FILE = "corners.csv"
 
 
-def get_seasons():
-    url = f"https://api.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/seasons"
-    return requests.get(url, headers=HEADERS).json()["seasons"]
+def fetch_json(page, url):
+    response = page.request.get(url)
+
+    if response.status != 200:
+        return None
+
+    return response.json()
 
 
-def get_rounds(season_id):
-    url = f"https://api.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/season/{season_id}/rounds"
-    return requests.get(url, headers=HEADERS).json()["rounds"]
+def get_current_season(seasons):
+    seasons_sorted = sorted(seasons, key=lambda x: x["id"], reverse=True)
+
+    for s in seasons_sorted:
+        if "20" in str(s.get("year", "")):
+            return s["id"]
+
+    return seasons_sorted[0]["id"]
 
 
-def get_matches(season_id, round_number):
-    url = f"https://api.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/season/{season_id}/events/round/{round_number}"
-    return requests.get(url, headers=HEADERS).json().get("events", [])
+def extract_corners(stats):
+    result = {
+        "home_first": 0,
+        "away_first": 0,
+        "home_second": 0,
+        "away_second": 0,
+    }
 
+    for period_data in stats.get("statistics", []):
+        period = period_data.get("period")
 
-def descobrir_rodada_atual(season_id, rounds):
-    agora = datetime.now()
+        for group in period_data.get("groups", []):
+            for stat in group.get("statisticsItems", []):
 
-    rodada_atual = None
-    melhor_data = None
+                if stat.get("key") == "cornerKicks":
+                    home = int(stat.get("homeValue", 0))
+                    away = int(stat.get("awayValue", 0))
 
-    for r in rounds:
-        matches = get_matches(season_id, r["round"])
+                    if period == "1ST":
+                        result["home_first"] = home
+                        result["away_first"] = away
 
-        if not matches:
-            continue
+                    elif period == "2ND":
+                        result["home_second"] = home
+                        result["away_second"] = away
 
-        datas = [
-            datetime.fromtimestamp(m["startTimestamp"])
-            for m in matches if m.get("startTimestamp")
-        ]
-
-        if not datas:
-            continue
-
-        data_inicio = min(datas)
-
-        if data_inicio <= agora:
-            if not melhor_data or data_inicio > melhor_data:
-                melhor_data = data_inicio
-                rodada_atual = r["round"]
-
-    return rodada_atual
+    return result
 
 
 def main():
-    seasons = get_seasons()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context()
+        page = context.new_page()
 
-    season_id = None
+        with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(file, fieldnames=[
+                "game_id",
+                "team_id",
+                "opponent_id",
+                "favored_id",
+                "half",
+                "championship_id",
+                "date",
+                "hour",
+                "code"
+            ])
+            writer.writeheader()
 
-    for s in seasons:
-        sid = s["id"]
-        rounds = get_rounds(sid)
+            for league in LEAGUES:
+                print(f"\n🔍 Liga {league}")
 
-        if rounds:
-            season_id = sid
-            break
+                seasons_data = fetch_json(
+                    page,
+                    f"https://api.sofascore.com/api/v1/unique-tournament/{league}/seasons"
+                )
 
-    if not season_id:
-        print("❌ Nenhuma season encontrada")
-        return
+                if not seasons_data:
+                    continue
 
-    print(f"Usando season {season_id}")
+                seasons = seasons_data.get("seasons", [])
+                if not seasons:
+                    continue
 
-    rounds = get_rounds(season_id)
+                season_id = get_current_season(seasons)
 
-    current_round = descobrir_rodada_atual(season_id, rounds)
+                rounds_data = fetch_json(
+                    page,
+                    f"https://api.sofascore.com/api/v1/unique-tournament/{league}/season/{season_id}/rounds"
+                )
 
-    if not current_round:
-        print("❌ Não conseguiu determinar rodada atual")
-        return
+                if not rounds_data:
+                    continue
 
-    next_round = current_round + 1
+                rounds = rounds_data.get("rounds", [])
 
-    print(f"Rodada atual: {current_round}")
-    print(f"Próxima rodada: {next_round}")
+                for r in rounds:
+                    round_number = r["round"]
 
-    target_rounds = [current_round, next_round]
+                    events_data = fetch_json(
+                        page,
+                        f"https://api.sofascore.com/api/v1/unique-tournament/{league}/season/{season_id}/events/round/{round_number}"
+                    )
 
-    dados = []
+                    if not events_data:
+                        continue
 
-    for round_number in target_rounds:
-        print(f"\n🔵 Rodada {round_number}")
+                    events = events_data.get("events", [])
 
-        matches = get_matches(season_id, round_number)
+                    print(f"Rodada {round_number} → {len(events)} jogos")
 
-        for match in matches:
-            match_id = match["id"]
+                    for match in events:
+                        try:
+                            timestamp = match.get("startTimestamp")
 
-            home_team = match["homeTeam"]
-            away_team = match["awayTeam"]
+                            if not timestamp or timestamp < 1000000000:
+                                continue
 
-            home_id = home_team["id"]
-            away_id = away_team["id"]
+                            stats = fetch_json(
+                                page,
+                                f"https://api.sofascore.com/api/v1/event/{match['id']}/statistics"
+                            )
 
-            home_name = home_team["name"]
-            away_name = away_team["name"]
+                            if not stats:
+                                continue
 
-            timestamp = match.get("startTimestamp")
+                            corners = extract_corners(stats)
 
-            if not timestamp:
-                continue
+                            dt = datetime.fromtimestamp(timestamp)
 
-            data_jogo = datetime.fromtimestamp(timestamp)
-            date = data_jogo.strftime("%Y-%m-%d")
-            hour = data_jogo.strftime("%H:%M:%S")
+                            game_id = match["id"]
+                            team_id = match["homeTeam"]["id"]
+                            opponent_id = match["awayTeam"]["id"]
 
-            print(f"  {home_name} x {away_name} ({date})")
+                            def write_rows(count, favored_id, half):
+                                for _ in range(count):
+                                    writer.writerow({
+                                        "game_id": game_id,
+                                        "team_id": team_id,
+                                        "opponent_id": opponent_id,
+                                        "favored_id": favored_id,
+                                        "half": half,
+                                        "championship_id": league,
+                                        "date": dt.strftime("%Y-%m-%d"),
+                                        "hour": dt.strftime("%H:%M:%S"),
+                                        "code": str(uuid.uuid4())
+                                    })
 
-            # 🔥 APENAS 1 LINHA POR JOGO
-            dados.append({
-                "id": match_id,
-                "active": 1,
-                "hour": hour,
-                "date": date,
-                "championship_id": TOURNAMENT_ID,
-                "team_id": home_id,       # CASA
-                "opponent_id": away_id,   # VISITANTE
-                "code": str(uuid.uuid4())
-            })
+                            # CASA
+                            write_rows(corners["home_first"], team_id, "first")
+                            write_rows(corners["home_second"], team_id, "second")
 
-    df = pd.DataFrame(dados)
+                            # VISITANTE
+                            write_rows(corners["away_first"], opponent_id, "first")
+                            write_rows(corners["away_second"], opponent_id, "second")
 
-    if not df.empty:
-        df.to_csv("next_rounds.csv", index=False)
-        print("\n✅ CSV corrigido: next_rounds.csv")
-    else:
-        print("\n⚠️ Nenhum dado encontrado")
+                        except Exception as e:
+                            print(f"Erro jogo {match['id']}: {e}")
+
+        browser.close()
+
+    print("\n✅ CSV de escanteios gerado!")
 
 
 if __name__ == "__main__":

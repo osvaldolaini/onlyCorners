@@ -24,6 +24,10 @@ class CornerList extends Component
     public $min;
     public $favored_id;
 
+
+    public $next;
+    public $previous;
+
     public function mount(Game $game)
     {
         $this->game = $game;
@@ -33,9 +37,18 @@ class CornerList extends Component
             ->get();
         $this->half = $game->half;
         $this->favored_id = $game->favored_id;
+
+        $this->next = Game::where('active', 1)
+            ->where('id', '>', $game->id)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        // Buscar o item anterior ativo com ID menor que o atual
+        $this->previous = Game::where('active', 1)
+            ->where('id', '<', $game->id)
+            ->orderBy('id', 'desc')
+            ->first();
     }
-
-
 
     public function render()
     {

@@ -1,5 +1,6 @@
-<div id="main-header" style="background: linear-gradient(90deg, #4db17d 0%, #2f9e9e 50%, #4db17d 100%);"
+<div id="main-header" style="background: linear-gradient(90deg, #08850e 0%, #14b32f 50%, #08850e 100%);"
     class="shadow transition duration-300">
+    {{-- <div id="main-header" style="background: #03e26f;" class="shadow transition duration-300"> --}}
 
     <div class="container mx-auto flex items-center justify-between px-4 py-2">
 
@@ -17,13 +18,13 @@
         {{-- Menu Desktop --}}
         <nav class="hidden md:flex space-x-6">
             <a href="{{ url('/') }}"
-                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Início</a>
+                class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Início</a>
             <a href="{{ route('all-corners') }}"
-                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Escanteios</a>
+                class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Escanteios</a>
             <a href="{{ url('/resultados') }}"
-                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Resultados</a>
+                class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Resultados</a>
             <a href="{{ url('/sobre') }}"
-                class="text-gray-900 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Sobre</a>
+                class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Sobre</a>
         </nav>
 
         {{-- Botão menu mobile --}}
@@ -49,9 +50,9 @@
                 ✕
             </button>
         </div>
-        <a href="{{ url('/') }}" class="block text-gray-700 hover:text-indigo-600">Início</a>
-        <a href="{{ url('/sobre') }}" class="block text-gray-700 hover:text-indigo-600">Sobre</a>
-        <a href="{{ url('/contato') }}" class="block text-gray-700 hover:text-indigo-600">Contato</a>
+        <a href="{{ url('/') }}" class="block text-gray-100 hover:text-indigo-600">Início</a>
+        <a href="{{ url('/sobre') }}" class="block text-gray-100 hover:text-indigo-600">Sobre</a>
+        <a href="{{ url('/contato') }}" class="block text-gray-100 hover:text-indigo-600">Contato</a>
     </nav>
 
     <script>

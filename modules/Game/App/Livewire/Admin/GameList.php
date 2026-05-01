@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 
 use Exception;
 use Modules\Championship\App\Models\Championship;
+use Modules\Corner\App\Models\Corner;
 use Modules\Team\App\Models\Team;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -41,7 +42,7 @@ class GameList extends Component
     public $relationTables =  "teams,teams.id,games.team_id | championships,championships.id,games.championship_id";
     public $customSearch;  //Colunas personalizadas, customizar no model
     public $columnsInclude = 'games.date,games.hour,games.opponent_id,games.team_id,games.championship_id,championships.logo_path,championships.nick,teams.logo_path,teams.nick,games.active as status';
-    public $searchable = 'teams.nick,nick,games.date,games.hour,'; //Colunas pesquisadas no banco de dados
+    public $searchable = 'games.id,teams.nick,championships.nick,games.date,games.hour'; //Colunas pesquisadas no banco de dados
 
     public $paginate = 15; //Qtd de registros por página
     public $active = 'games.active';
@@ -49,13 +50,14 @@ class GameList extends Component
     public $tornament_id = 325;
     public $tot = 0;
     public $tournaments;
+    public $count;
+    public $gamesExcluded = 0;
 
     public function getSofaScore()
     {
 
         $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe"; // ou caminho absoluto se necessário
         $script = base_path("python\get_only_games.py");
-
 
         $command = [
             $pythonExecutable,
@@ -108,9 +110,198 @@ class GameList extends Component
             // dd('Sem jogos');
         }
     }
+
     public function mount()
     {
         $this->tournaments = Championship::where('active', 1)->get();
+        // $this->getCornersSofaScore();
+    }
+    public function getCornersSofaScore()
+    {
+        $this->getAllCorners();
+        $games = Game::where('date', '<', date('Y-m-d'))
+            ->where('active', 1)
+            ->with(['corners'])
+            ->whereDoesntHave('corners')
+            ->where('championship_id', $this->tornament_id)
+            ->limit(10)
+            ->get();
+        // dd($games);
+
+        if ($games->count() < 1) {
+            $this->openAlert('success', 'Nenhum jogo encontrado.');
+            return;
+        } else {
+            $this->count = 0;
+            // dd($games);
+            foreach ($games as $game) {
+
+                if ($this->count >= 10) {
+                    break;
+                }
+                if ($game->corners->count() == 0) {
+                    // dd($game->id);
+                    $this->getCorners($game);
+                    $this->count++;
+                }
+            }
+
+            $this->openAlert('success', $this->count . ' jogos inseridos com sucesso.');
+            $this->openAlert('error', $this->gamesExcluded . ' jogos excluídos com sucesso.');
+        }
+    }
+    public function getCorners($game)
+    {
+        // dd($game);
+        $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe"; // ou caminho absoluto se necessário
+        $script = base_path("python\get_only_corner.py");
+
+        $command = [
+            $pythonExecutable,
+            $script,
+        ];
+
+        // Criar uma nova instância de Process
+        $process = new Process($command);
+
+        $process->setTimeout(120);        // ou 180 segundos
+        // $process->setTimeout(null);    // sem timeout (cuidado em produção)
+
+        $process->setInput(json_encode($game->id));
+
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            dd($process->getErrorOutput());
+        }
+
+        $output = $process->getOutput();
+
+        $decoded = json_decode($output, true);
+        // dd($decoded);
+        if ($decoded['success']) {
+            //deleta os antigos
+            // $this->cleanCorners();
+            foreach ($decoded['results'] as $corners) {
+                if (array_key_exists('error', $corners)) {
+                    // dd($corners['event_id']);
+                    $g = Game::find($corners['event_id'])->delete();
+                    // dd($g, $corners['event_id']);
+                    $this->gamesExcluded++;
+                } else {
+                    // =====================
+                    // 🟢 CASA - 1º TEMPO
+                    // =====================
+                    if ($corners['home_first_half'] > 0) {
+                        for ($i = 0; $i < $corners['home_first_half']; $i++) {
+                            Corner::create([
+                                'active'            => 1,
+                                'date'              => $game->date,
+                                'hour'              => $game->hour,
+                                'game_id'           => $game->id,
+                                'team_id'           => $game->team_id,
+                                'opponent_id'       => $game->opponent_id,
+                                'championship_id'   => $game->championship_id,
+                                'favored_id'        => $game->team_id,
+                                'half'              => 'first',
+                                'code'              => Str::uuid(),
+                            ]);
+                        }
+                    }
+
+                    // =====================
+                    // 🔵 CASA - 2º TEMPO
+                    // =====================
+                    if ($corners['home_second_half'] > 0) {
+                        for ($i = 0; $i < $corners['home_second_half']; $i++) {
+                            Corner::create([
+                                'active'            => 1,
+                                'date'              => $game->date,
+                                'hour'              => $game->hour,
+                                'game_id'           => $game->id,
+                                'team_id'           => $game->team_id,
+                                'opponent_id'       => $game->opponent_id,
+                                'championship_id'   => $game->championship_id,
+                                'favored_id'        => $game->team_id,
+                                'half'              => 'second',
+                                'code'              => Str::uuid(),
+                            ]);
+                        }
+                    }
+
+                    // =====================
+                    // 🔴 VISITANTE - 1º TEMPO
+                    // =====================
+                    if ($corners['away_first_half'] > 0) {
+                        for ($i = 0; $i < $corners['away_first_half']; $i++) {
+                            Corner::create([
+                                'active'            => 1,
+                                'date'              => $game->date,
+                                'hour'              => $game->hour,
+                                'game_id'           => $game->id,
+                                'team_id'           => $game->team_id,
+                                'opponent_id'       => $game->opponent_id,
+                                'championship_id'   => $game->championship_id,
+                                'favored_id'        => $game->opponent_id,
+                                'half'              => 'first',
+                                'code'              => Str::uuid(),
+                            ]);
+                        }
+                    }
+
+                    // =====================
+                    // 🟡 VISITANTE - 2º TEMPO
+                    // =====================
+                    if ($corners['away_second_half'] > 0) {
+                        for ($i = 0; $i < $corners['away_second_half']; $i++) {
+                            Corner::create([
+                                'active'            => 1,
+                                'date'              => $game->date,
+                                'hour'              => $game->hour,
+                                'game_id'           => $game->id,
+                                'team_id'           => $game->team_id,
+                                'opponent_id'       => $game->opponent_id,
+                                'championship_id'   => $game->championship_id,
+                                'favored_id'        => $game->opponent_id,
+                                'half'              => 'second',
+                                'code'              => Str::uuid(),
+                            ]);
+                        }
+                    }
+                }
+            }
+        } else {
+            $this->openAlert('error', 'Nenhum jogo encontrado.');
+            // dd('Sem jogos');
+        }
+
+
+
+
+        // $this->loadCorners();
+    }
+    //Baixar escanteios em csv.
+    public function getAllCorners()
+    {
+        $ids = Game::whereDoesntHave('corners')
+            ->where('championship_id', $this->tornament_id)
+            ->limit(200) // ⚠️ importante pra não travar
+            ->pluck('id')
+            ->toArray();
+
+        // dd($ids);
+        $pythonExecutable = "C:\\laragon\\bin\\python\\python-3.10\\python.exe";
+        $script = base_path("python/bet_test.py");
+
+        $process = new Process([$pythonExecutable, $script]);
+
+        $process->setTimeout(120);
+        $process->setInput(json_encode($ids));
+
+        $process->run();
+        if (!$process->isSuccessful()) {
+            dd($process->getErrorOutput(), $process->getOutput());
+        }
     }
 
     #[On('see_excluded')]
@@ -125,11 +316,13 @@ class GameList extends Component
                 'searchable' => $this->searchable,
                 'sort' => $this->sorts,
                 'paginate' => $this->paginate,
+                // 'where' => ['games.date' => date('Y-m-d')],
                 'search' => $this->search,
                 'customSearch' => $this->customSearch,
                 'active' => $this->active,
             ])
             ->getData();
+        // dd($dataTable);
         return view(
             'game::livewire.admin.game-list',
             compact('dataTable')

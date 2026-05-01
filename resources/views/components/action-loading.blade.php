@@ -472,7 +472,7 @@
             }
         }
     </style>
-    <div wire:target="getSofaScore"
+    <div wire:target="getSofaScore,getCornersSofaScore"
         class="fixed w-full h-screen top-0 right-0 z-50 items-center justify-items-center
     bg-blue-900 bg-opacity-50 backdrop-brightness-50 backdrop-blur-sm "
         wire:loading>

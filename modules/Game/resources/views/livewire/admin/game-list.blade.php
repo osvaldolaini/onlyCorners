@@ -5,6 +5,7 @@
             <h3 class="text-2xl font-bold tracki dark:text-gray-50">
                 {{ $breadcrumb }}
             </h3>
+
         </x-slot>
 
     </x-layouts.breadcrumb>
@@ -24,12 +25,12 @@
     <x-table.table>
         <x-slot name="head">
             <div class="w-full flex items-center justify-center">
-                {{-- <button wire:click="getSofaScore"
+                <button wire:click="getCornersSofaScore"
                     class="flex text-center items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">
-                    <span>Adicionar jogos SofaScore</span>
+                    <span>Adicionar escanteios</span>
                     <x-layout.svg.search class="w-5 h-5 ">
                     </x-layout.svg.search>
-                </button> --}}
+                </button>
                 <div class="flex items-center gap-3">
 
                     {{-- SELECT DE CAMPEONATOS --}}
@@ -40,7 +41,7 @@
 
                         @foreach ($tournaments as $tournament)
                             <option value="{{ $tournament->id }}">
-                                {{ $tournament->nick }}
+                                {{ $tournament->nick ?? '' }}
                             </option>
                         @endforeach
 
@@ -119,7 +120,7 @@
                             </span>
                         </td>
                         <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
-                            {{ $item->championship->nick }}
+                            {{ $item->championship->nick ?? '' }}
                         </td>
                         <td class="px-4 py-1 text-sm font-normal text-center text-gray-500 dark:text-gray-400">
                             <a href="{{ route('corners-list', $item->id) }}"
