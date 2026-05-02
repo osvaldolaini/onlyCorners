@@ -8,11 +8,33 @@
                 </h3>
             </x-slot>
             <x-slot name="right">
-                <div class="p-0 tooltip tooltip-top" data-tip="Planilha de dados em .xlxs" wire:ignore>
+                {{-- <div class="p-0 tooltip tooltip-top" data-tip="Planilha de dados em .xlxs" wire:ignore>
                     <button wire:click="get_data()"
                         class="cursor-pointer px-3 py-2 transition-colors duration-200 rounded-sm hover:text-white dark:hover:bg-blue-500 hover:bg-blue-500 whitespace-nowrap">
                         <x-layout.svg.excel class="w-6 h-6"></x-layout.svg.excel>
                     </button>
+                </div> --}}
+                <div class="p-0 tooltip tooltip-top" data-tip="Planilha de dados em .xlsx">
+
+                    <button wire:click="get_data"
+                        class="cursor-pointer px-3 py-2 transition-all duration-200 rounded-sm hover:text-white dark:hover:bg-green-500 hover:bg-green-500 whitespace-nowrap flex items-center gap-2">
+
+                        <!-- Ícone normal -->
+                        <span wire:loading.remove wire:target="get_data">
+                            <x-layout.svg.excel class="w-6 h-6"></x-layout.svg.excel>
+                        </span>
+
+                        <!-- Loading -->
+                        <span wire:loading wire:target="get_data" class="flex items-center gap-2">
+                            {{-- <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                                    fill="none" />
+                            </svg> --}}
+                            <span>Baixando...</span>
+                        </span>
+
+                    </button>
+
                 </div>
             </x-slot>
         </x-breadcrumb>
@@ -170,8 +192,4 @@
         </div>
 
     </aside>
-
-</div>
-
-
 </div>

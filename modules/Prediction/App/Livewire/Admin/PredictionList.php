@@ -66,6 +66,7 @@ class PredictionList extends Component
         $games = $this->getGames();
 
         if (!$games['success']) {
+            $this->openAlert('error', 'Não existe o mínimo de jogos no período.');
             return;
         }
         // dd(($games));
@@ -139,7 +140,7 @@ class PredictionList extends Component
                         continue;
                     }
 
-
+                    $g = Game::find($m['game_id']);
                     $matches[] = [
                         'game_id'       => $m['game_id'],
                         'home_team'     => Team::find($g['home_team'])->nick,
@@ -151,7 +152,7 @@ class PredictionList extends Component
                         'explanation'   => $this->generateExplanation($g),
                         'won'           => '',
                         'result_corners' => '',
-
+                        'start_time'    =>  $g->date . ' ' . $g->hour,
                     ];
                     // dd($matches);
                 }
@@ -223,13 +224,15 @@ class PredictionList extends Component
                 ->get();
         }
 
-        if ($games->count() > 3) {
+        if ($games->count() > 2) {
             return [
                 'success' => true,
                 'games' => $games
             ];
         } else {
-            $this->openAlert('error', 'Não existe o mínimo de jogos no período.');
+            return [
+                'success' => false,
+            ];
         }
     }
 

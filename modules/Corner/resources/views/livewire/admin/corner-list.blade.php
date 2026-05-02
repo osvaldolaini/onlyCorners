@@ -489,7 +489,7 @@
                 </div>
                 <h2 class="text-2xl font-semibold leadi tracki">Atualizando<span
                         class="loading loading-dots loading-xs"></span></h2>
-                <div wire:model='count'>{{ $count }}</div>
+
                 {{-- <p class="flex-1 text-center text-white">Aguarde o envio dos emails.</p> --}}
             </div>
         </div>

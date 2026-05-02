@@ -20,14 +20,26 @@ class PlanAllCorner implements FromView, WithProperties
     {
         return view('livewire.page.plan-all-corners', [
             'title'           => 'Todos escanteios',
-            'data'            => Corner::all(),
+            'data'            => Corner::select(
+                'half',
+                'game_id',
+                'favored_id',
+                'min',
+                'half',
+                'hour',
+                'date',
+                'championship_id',
+                'code',
+                'opponent_id',
+                'team_id',
+            )->get(),
         ]);
     }
 
     public function properties(): array
     {
         return [
-            'creator'        => Auth::user()->name,
+            'creator'        => 'onlyCorners.com',
         ];
     }
 }

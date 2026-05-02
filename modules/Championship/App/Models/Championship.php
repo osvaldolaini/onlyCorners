@@ -21,6 +21,7 @@ class Championship extends Model
     protected $fillable = [
         'active',
         'title',
+        'sofascore_id',
         'nick',
         'code',
         'type',

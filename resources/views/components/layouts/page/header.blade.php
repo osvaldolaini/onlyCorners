@@ -23,6 +23,9 @@
                 class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Escanteios</a>
             <a href="{{ url('/resultados') }}"
                 class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Resultados</a>
+            <a href="{{ url('/analises') }}"
+                class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Análises</a>
+
             <a href="{{ url('/sobre') }}"
                 class="text-gray-100 dark:text-white text-lg font-semibold tracking-wide hover:text-blue-600 transition">Sobre</a>
         </nav>
