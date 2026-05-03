@@ -211,14 +211,14 @@ class PredictionList extends Component
         if ($this->tornament_id) {
             // dd();
             $games = Game::whereBetween('date', [$startDate, $endDate])
-                ->where('date', '>=', Carbon::now())
+                // ->where('date', '>=', Carbon::now())
                 ->where('championship_id', $this->tornament_id)
                 ->whereDoesntHave('corners')
                 ->orderBy('date')
                 ->get();
         } else {
             $games = Game::whereBetween('date', [$startDate, $endDate])
-                ->where('date', '>=', Carbon::now())
+                // ->where('date', '>=', Carbon::now())
                 // ->where('tornament_id', $this->tornament_id)
                 ->whereDoesntHave('corners')
                 ->orderBy('date')

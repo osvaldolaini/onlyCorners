@@ -1,5 +1,7 @@
 <div class="max-w-7xl mx-auto px-4 flex gap-6">
     <!-- CONTEÚDO CENTRAL -->
+
+    <x-action-loading></x-action-loading>
     <main class="flex-1">
         <x-breadcrumb>
             <x-slot name="left">
