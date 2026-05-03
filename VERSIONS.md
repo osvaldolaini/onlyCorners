@@ -1,5 +1,12 @@
 <p align="center"><a href="https://github.com/osvaldolaini" target="_blank"><img src="https://avatars.githubusercontent.com/u/75580327?v=4" width="100" alt="Laravel Logo"></a></p>
 
+## Versão Charles muller (V 1.0.3) "2026-05-03"
+
+> Melhoria
+
+-   Página de histórico
+-   Página de análise
+
 ## Versão Charles muller (V 1.0.2) "2026-05-01"
 
 > Novo

@@ -4,160 +4,95 @@ namespace App\Livewire\Page;
 
 use Livewire\Component;
 
-use Modules\Prediction\App\Models\Prediction;
-use App\Enums\CornerMarketLabel;
+use App\Services\LaiGuz\TableService;
+
+use Livewire\WithPagination;
+use Modules\Game\App\Models\Game;
 
 class Analysis extends Component
 {
     // Define o layout a ser usado
     protected $layout = 'page';
-    public $breadcrumb = 'Analise de mercado';
 
-    public $labelsMarkets;
-    public $winsMarkets;
-    public $lossesMarkets;
+    use WithPagination;
+    public $breadcrumb = 'Jogos do dia';
+    public $modal = false;
+    public $showModalShow = false;
 
-    public $labelsOver;
-    public $winsOver;
-    public $lossesOver;
+    public $rules;
+    public $detail;
+    public $games;
+    public $id;
 
-    // montar arrays UNDER
-    public $labelsUnder;
-    public $winsUnder;
-    public $lossesUnder;
+    //Dados da tabela
+    protected $queryService;
+    public $model = "Modules\Game\App\Models\Game"; //Model principal
+    public $modelId = "games.id"; //Ex: 'table.id' or 'id'
+    public $search;
+    public $sorts = ['games.date' => 'desc', 'games.hour' => 'asc'];
+    public $relationTables =  "teams,teams.id,games.team_id | championships,championships.id,games.championship_id";
+    public $customSearch;  //Colunas personalizadas, customizar no model
+    public $columnsInclude = 'games.date,games.hour,games.opponent_id,games.team_id,games.championship_id,championships.logo_path,championships.nick,teams.logo_path,teams.nick,games.active as status';
+    public $searchable = 'teams.nick,games.date'; //Colunas pesquisadas no banco de dados
 
-    public $tableMarkets;
+    public $paginate = 50; //Qtd de registros por página
+    public $active = 'games.active';
 
-    public function render()
+
+    public function render(TableService $queryService)
     {
-        $this->chartMarkets();
-        $this->tableMarkets();
-        return view('livewire.page.analysis')
-            ->layout('layouts.' . $this->layout);
+        if (date('H:i') > '20:00') {
+            $d = date('Y-m-d', strtotime('+1 day'));
+        } else {
+            $d = date('Y-m-d');
+        }
+
+
+        $dataTable = $queryService
+            ->setModel($this->model)
+            ->setParameters([
+                'modelId' => $this->modelId,
+                'relationTables' => $this->relationTables,
+                'columnsInclude' => $this->columnsInclude,
+                'searchable' => $this->searchable,
+                'sort' => $this->sorts,
+                'paginate' => $this->paginate,
+                'where' => [
+                    'games.date' => $d,
+                ],
+                'search' => $this->search,
+                'customSearch' => $this->customSearch,
+                'active' => $this->active,
+            ])
+            ->getData();
+        return view(
+            'livewire.page.analysis',
+            compact('dataTable')
+        )->layout('layouts.' . $this->layout);
     }
 
-    public function tableMarkets()
+    public function go(Game $game)
     {
-        $markets = [];
-
-        $predictions = Prediction::all();
-
-        foreach ($predictions as $prediction) {
-
-            $matches = json_decode($prediction->matches, true);
-
-            if (!$matches) continue;
-
-            foreach ($matches as $match) {
-
-                $type = $match['type'] ?? null;
-                $won = $match['won'] ?? null;
-
-                if (!$type) continue;
-
-                if (!isset($markets[$type])) {
-                    $markets[$type] = [
-                        'wins' => 0,
-                        'losses' => 0
-                    ];
-                }
-
-                if ($won === true) {
-                    $markets[$type]['wins']++;
-                } else {
-                    $markets[$type]['losses']++;
-                }
-            }
-        }
-
-        // 🔥 ordenar por linha numérica
-        uksort($markets, function ($a, $b) {
-            preg_match('/_(\d+)_(\d+)/', $a, $ma);
-            preg_match('/_(\d+)_(\d+)/', $b, $mb);
-
-            $va = ($ma[1] ?? 0) + (($ma[2] ?? 0) / 10);
-            $vb = ($mb[1] ?? 0) + (($mb[2] ?? 0) / 10);
-
-            return $va <=> $vb;
-        });
-
-        $table = [];
-
-        foreach ($markets as $type => $data) {
-
-            $total = $data['wins'] + $data['losses'];
-
-            $rate = $total > 0
-                ? round(($data['wins'] / $total) * 100)
-                : 0;
-
-            $table[] = [
-                'market' => strtoupper(str_replace('_', '.', $type)), // over_6_5 → OVER 6.5
-                'wins' => $data['wins'],
-                'losses' => $data['losses'],
-                'rate' => $rate
-            ];
-        }
-
-        $this->tableMarkets = $table;
+        $this->showModalShow = true;
+        $this->detail = $game;
     }
-    public function chartMarkets()
+    public function addSort($field)
     {
-        $over = [];
-        $under = [];
-
-        $predictions = Prediction::all();
-
-        foreach ($predictions as $prediction) {
-
-            $matches = json_decode($prediction->matches, true);
-
-            if (!$matches) continue;
-
-            foreach ($matches as $match) {
-
-                $type = $match['type'] ?? null;
-                $won = $match['won'] ?? null;
-
-                if (!$type) continue;
-
-                // extrai linha: over_6_5 → 6.5
-                preg_match('/_(\d+)_(\d+)/', $type, $m);
-                $line = isset($m[1]) ? $m[1] . '.' . $m[2] : 0;
-
-                $target = str_contains($type, 'over') ? $over : $under;
-
-                if (!isset($target[$line])) {
-                    $target[$line] = ['wins' => 0, 'losses' => 0];
-                }
-
-                if ($won === true) {
-                    $target[$line]['wins']++;
-                } else {
-                    $target[$line]['losses']++;
-                }
-
-                // precisa reatribuir (php não é referência automática aqui)
-                if (str_contains($type, 'over')) {
-                    $over[$line] = $target[$line];
-                } else {
-                    $under[$line] = $target[$line];
-                }
-            }
+        // dd($field);
+        if (isset($this->sorts[$field])) {
+            $this->sorts[$field] = $this->sorts[$field] === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sorts = [];
+            $this->sorts[$field] = '';
+            $this->sorts[$field] = 'asc';
         }
+        // dd($this->sorts);
+    }
 
-        // 🔥 ordena corretamente
-        ksort($over, SORT_NUMERIC);
-        ksort($under, SORT_NUMERIC);
 
-        // montar arrays OVER
-        $this->labelsOver = array_map(fn($l) => "Over $l", array_keys($over));
-        $this->winsOver = array_column($over, 'wins');
-        $this->lossesOver = array_column($over, 'losses');
-
-        // montar arrays UNDER
-        $this->labelsUnder = array_map(fn($l) => "Under $l", array_keys($under));
-        $this->winsUnder = array_column($under, 'wins');
-        $this->lossesUnder = array_column($under, 'losses');
+    //MESSAGE
+    public function openAlert($status, $msg)
+    {
+        $this->dispatch('openAlert', $status, $msg);
     }
 }

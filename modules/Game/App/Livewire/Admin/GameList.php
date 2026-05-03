@@ -119,7 +119,7 @@ class GameList extends Component
     public function getCornersSofaScore()
     {
         $this->getAllCorners();
-        $games = Game::where('date', '<', date('Y-m-d'))
+        $games = Game::where('date', '<=', date('Y-m-d'))
             ->where('active', 1)
             ->with(['corners'])
             ->whereDoesntHave('corners')

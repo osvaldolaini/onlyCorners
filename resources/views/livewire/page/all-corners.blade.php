@@ -178,7 +178,9 @@
 
         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow text-center">
             <p class="text-sm text-gray-500">Publicidade</p>
-            <div class="h-40 bg-gray-200 dark:bg-gray-700 rounded mt-2"></div>
+            <div class="h-40 bg-gray-200 dark:bg-gray-700 rounded mt-2">
+
+            </div>
         </div>
 
 

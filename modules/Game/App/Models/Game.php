@@ -12,9 +12,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 
-use Illuminate\Support\Str;
 use Modules\Championship\App\Models\Championship;
 use Modules\Corner\App\Models\Corner;
+use Modules\Prediction\App\Services\CornerStatsGamesService;
 use Modules\Team\App\Models\Team;
 
 class Game extends Model
@@ -116,5 +116,22 @@ class Game extends Model
             $code = explode('.', $this->logo_path);
             return $code[0];
         }
+    }
+
+    public function last()
+    {
+        $g = Game::where('opponent_id', $this->team_id)->where('team_id', $this->opponent_id)->first();
+        // dd($g);
+        return $g;
+    }
+
+    public function stats()
+    {
+        $statsService = new CornerStatsGamesService();
+        $games = [
+            'success' => true,
+            'games' => [$this]
+        ];
+        return $statsService->analyzeGames(collect($games['games']));
     }
 }

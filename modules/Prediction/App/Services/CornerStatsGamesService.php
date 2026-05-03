@@ -10,7 +10,7 @@ class CornerStatsGamesService
     public function analyzeGames(Collection $games)
     {
         $predictions = [];
-
+        // dd($games);
         $teamIds = $games
             ->flatMap(fn($g) => [$g->team_id, $g->opponent_id])
             ->unique();

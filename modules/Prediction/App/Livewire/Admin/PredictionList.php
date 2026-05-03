@@ -140,7 +140,8 @@ class PredictionList extends Component
                         continue;
                     }
 
-                    $g = Game::find($m['game_id']);
+                    $gm = Game::find($m['game_id']);
+                    // dd()
                     $matches[] = [
                         'game_id'       => $m['game_id'],
                         'home_team'     => Team::find($g['home_team'])->nick,
@@ -152,7 +153,7 @@ class PredictionList extends Component
                         'explanation'   => $this->generateExplanation($g),
                         'won'           => '',
                         'result_corners' => '',
-                        'start_time'    =>  $g->date . ' ' . $g->hour,
+                        'start_time'    =>  $gm->date . ' ' . $gm->hour,
                     ];
                     // dd($matches);
                 }
