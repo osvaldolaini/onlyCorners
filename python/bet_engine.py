@@ -26,18 +26,64 @@ def debug_input(games):
     }
 
 
+# def group_markets(games):
+#     grouped = defaultdict(list)
+#     for g in games:
+#         game_id = g.get("game_id") or g.get("id")
+#         for m in g.get("markets", []):
+#             prob = max(0.01, min(0.99, float(m["probability"])))
+#             grouped[game_id].append({
+#                 "game_id": game_id,
+#                 "type": m["type"],
+#                 "odd": float(m["odd"]),
+#                 "prob": prob,
+#             })
+#     return list(grouped.values())
+
 def group_markets(games):
+
     grouped = defaultdict(list)
+
     for g in games:
+
         game_id = g.get("game_id") or g.get("id")
+
+        overs = []
+        unders = []
+
         for m in g.get("markets", []):
+
             prob = max(0.01, min(0.99, float(m["probability"])))
-            grouped[game_id].append({
+
+            market = {
                 "game_id": game_id,
                 "type": m["type"],
                 "odd": float(m["odd"]),
                 "prob": prob,
-            })
+            }
+
+            if "over" in m["type"]:
+                overs.append(market)
+            else:
+                unders.append(market)
+
+        # ------------------------------------------------
+        # 🔥 ORDENA POR PROBABILIDADE
+        # ------------------------------------------------
+
+        overs = sorted(overs, key=lambda x: x["prob"], reverse=True)
+
+        unders = sorted(unders, key=lambda x: x["prob"], reverse=True)
+
+        # ------------------------------------------------
+        # 🔥 LIMITA QUANTIDADE
+        # ------------------------------------------------
+
+        overs = overs[:2]
+        unders = unders[:2]
+
+        grouped[game_id] = overs + unders
+
     return list(grouped.values())
 
 

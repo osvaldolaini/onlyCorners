@@ -13,7 +13,20 @@
 
     {{-- Botão Adicionar Novo Escanteio --}}
     <div class="grid grid-cols-6">
+        <div class="col-span-full flex justify-center space-x-2">
+            @foreach ($tournaments as $tournament)
+                <label class="flex items-center gap-3 p-2 rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-700">
 
+                    <input type="checkbox" value="{{ $tournament->id }}" wire:model.live="selectedTornaments"
+                        class="checkbox checkbox-sm checkbox-primary">
+
+                    <span class="text-sm font-medium">
+                        {{ $tournament->nick }}
+                    </span>
+
+                </label>
+            @endforeach
+        </div>
         <div class="col-span-4 flex justify-center my-8">
             <div class="col-span-full sm:col-span-2 ">
                 <label class="block text-sm font-medium text-gray-900 dark:text-white" for="title">
@@ -24,7 +37,7 @@
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
-            {{-- SELECT DE CAMPEONATOS --}}
+            {{-- SELECT DE CAMPEONATOS
             <div class="col-span-full sm:col-span-2 ">
                 <label class="block text-sm font-medium text-gray-900 dark:text-white" for="title">
                     Campeonatos</label>
@@ -40,7 +53,7 @@
                     @endforeach
 
                 </select>
-            </div>
+            </div> --}}
 
             <button wire:click="generatePredictions"
                 class="cursor-pointer flex items-center gap-2 px-6 py-3 text-white bg-gray-700 hover:bg-blue-600 border border-gray-500 rounded-xl transition-all duration-200 font-medium">

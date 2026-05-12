@@ -76,6 +76,7 @@ class DetailPageCharts extends Component
         $this->avgAllLeague = $avgAll;
         $this->avgLast5League = $avgLast5;
     }
+
     public function chartByLeagueHalf()
     {
         $labels = [];

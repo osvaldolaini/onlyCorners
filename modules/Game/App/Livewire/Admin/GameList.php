@@ -86,10 +86,12 @@ class GameList extends Component
             foreach ($decoded['results'] as $game) {
                 $home_team_id = Team::where('sofascore_id', $game['home_team_id'])->first()->id;
                 $away_team_id = Team::where('sofascore_id', $game['away_team_id'])->first()->id;
+                // dd($game);
                 if ($game['date'] > date('Y-m-d')) {
                     $game = Game::updateOrCreate([
-                        'id'    => $game['event_id'],
+                        'id'                => $game['event_id'],
                     ], [
+                        'sofascore_id'      => $game['event_id'],
                         'active'            => 1,
                         'date'              =>  $game['date'],
                         'hour'              =>  $game['hour'],

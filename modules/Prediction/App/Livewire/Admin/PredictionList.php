@@ -25,10 +25,32 @@ class PredictionList extends Component
     public $tornament_id;
     public $date;
 
+    public array $selectedTornaments = [];
+
     public function mount()
     {
         $this->tournaments = Championship::where('active', 1)->get();
         // $this->getCornersSofaScore();
+    }
+
+    public function updatedSelectedTornaments()
+    {
+        // remove valores vazios
+        $this->selectedTornaments = array_filter(
+            $this->selectedTornaments,
+            fn($item) => !empty($item)
+        );
+
+        // remove duplicados
+        $this->selectedTornaments = array_unique(
+            $this->selectedTornaments
+        );
+
+        // reindexa array
+        $this->selectedTornaments = array_values(
+            $this->selectedTornaments
+        );
+        // dd($this->selectedTornaments);
     }
 
     // --------------------------------------------------------
@@ -88,6 +110,7 @@ class PredictionList extends Component
         } else {
             $this->openAlert('error', 'Não existem jogos no período.');
         }
+        $this->selectedTornaments = [];
     }
     //MESSAGE
     public function openAlert($status, $msg)
@@ -102,6 +125,7 @@ class PredictionList extends Component
     {
         // dd($cornerService);
         return collect($predictions)->map(function ($p) use ($cornerService) {
+            // dd($cornerService->generateMarketGrid($p['total_corners']));
             return [
                 'game_id' => $p['game_id'],
                 'markets' => $cornerService->generateMarketGrid($p['total_corners']),
@@ -208,23 +232,40 @@ class PredictionList extends Component
         //     ->whereDoesntHave('corners')
         //     ->orderBy('date')
         //     ->get();
-        if ($this->tornament_id) {
-            // dd();
+
+        // if ($this->tornament_id) {
+        //     // dd();
+        //     $games = Game::whereBetween('date', [$startDate, $endDate])
+        //         // ->where('date', '>=', Carbon::now())
+        //         ->where('championship_id', $this->tornament_id)
+        //         ->whereDoesntHave('corners')
+        //         ->orderBy('date')
+        //         ->get();
+        // } else {
+        //     $games = Game::whereBetween('date', [$startDate, $endDate])
+        //         // ->where('date', '>=', Carbon::now())
+        //         // ->where('tornament_id', $this->tornament_id)
+        //         ->whereDoesntHave('corners')
+        //         ->orderBy('date')
+        //         ->get();
+        // }
+        // dd($this->selectedTornaments);
+        if (!empty($this->selectedTornaments)) {
+
             $games = Game::whereBetween('date', [$startDate, $endDate])
-                // ->where('date', '>=', Carbon::now())
-                ->where('championship_id', $this->tornament_id)
+                ->whereIn('championship_id', $this->selectedTornaments)
                 ->whereDoesntHave('corners')
                 ->orderBy('date')
                 ->get();
         } else {
+
             $games = Game::whereBetween('date', [$startDate, $endDate])
-                // ->where('date', '>=', Carbon::now())
-                // ->where('tornament_id', $this->tornament_id)
                 ->whereDoesntHave('corners')
                 ->orderBy('date')
                 ->get();
         }
 
+        // dd($games);
         if ($games->count() > 2) {
             return [
                 'success' => true,

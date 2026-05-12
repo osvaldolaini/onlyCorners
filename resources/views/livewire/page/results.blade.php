@@ -13,6 +13,7 @@
             </x-slot>
         </x-breadcrumb>
         <div class="grid grid-cols-2 space-x-3 py-3 space-y-3">
+
             <div class="col-span-full sm:col-span-1">
                 <div class=" p-0 m-0 my-3 text-gray-900 rounded-b-md ">
                     <!-- Faltas por ano escolar -->

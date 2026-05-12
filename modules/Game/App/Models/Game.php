@@ -30,6 +30,7 @@ class Game extends Model
         'date',
         'championship_id',
         'code',
+        'sofascore_id',
         'opponent_id',
         'team_id',
         'updated_by',

@@ -3,7 +3,6 @@
 namespace App\Livewire\Page;
 
 use Livewire\Component;
-
 use Modules\Prediction\App\Models\Prediction;
 
 class Results extends Component
@@ -45,6 +44,8 @@ class Results extends Component
     public $lossesUnder;
 
 
+
+
     public function render()
     {
         $this->cards = Prediction::where('status', '!=', 'pending')
@@ -55,6 +56,7 @@ class Results extends Component
 
         $this->chartMarkets();
         $this->tableMarkets();
+
         return view('livewire.page.results')
             ->layout('layouts.' . $this->layout);
     }
